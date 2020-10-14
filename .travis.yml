@@ -31,7 +31,6 @@ install:
   - DB_HOST=127.0.0.1 DB_NAME=test DB_USER=test DB_PASS=test bin/install-wp-tests.sh
 
 script:
-  - vendor/bin/phpunit --group unit
-  # TODO integration tests
+  - vendor/bin/phpunit
   - ./vendor/bin/phpcs --standard=./phpcs.xml test/unit test/integration src
   - vendor/bin/phpstan analyse
