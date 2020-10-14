@@ -2,6 +2,7 @@
   "name": "sitecrafting/greg",
   "description": "A de-coupled calendar solution for WordPress and Timber",
   "license": "MIT",
+  "type": "wordpress-plugin",
   "authors": [
   ],
   "minimum-stability": "dev",
