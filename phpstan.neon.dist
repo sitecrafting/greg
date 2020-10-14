@@ -1,0 +1,12 @@
+includes:
+  - vendor/szepeviktor/phpstan-wordpress/extension.neon
+parameters:
+  level: 1
+  inferPrivatePropertyTypeFromConstructor: true
+  bootstrapFiles:
+    - phpstan/bootstrap.php
+  paths:
+    - src
+  ignoreErrors:
+    # TODO Figure out how to discover the WP_CLI class
+    - '#^Call to static method success\(\) on an unknown class WP_CLI\.$#'

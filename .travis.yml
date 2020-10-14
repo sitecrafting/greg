@@ -1,0 +1,32 @@
+# TravisCI configuration for sitecrafting/greg
+
+language: php
+os:
+  - linux
+dist: bionic
+
+php:
+  - '7.4'
+
+cache:
+  directories:
+    - '${HOME}/.composer/cache'
+
+jobs:
+  include:
+    - name: 'Building docs'
+      language: node_js
+      node_js: 10
+      install:
+        - yarn install --frozen-lockfile
+      script:
+        - ./scripts/build-docs.sh
+
+install:
+  - composer install --no-interaction --prefer-dist
+
+script:
+  - vendor/bin/phpunit --group unit
+  # TODO integration tests
+  - ./vendor/bin/phpcs --standard=./phpcs.xml test lib
+  - vendor/bin/phpstan analyse

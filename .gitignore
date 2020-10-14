@@ -1,0 +1,34 @@
+/vendor/
+/wp/
+/wp-content/
+/test/wp/
+/test/wp-tests-lib/
+/node_modules/
+/_book/
+/database-backups/
+/greg # temporary archive dir
+
+# build artifacts
+/greg-*.tar.gz
+/greg-*.zip
+
+# cypress test artifacts
+/cypress/videos
+/cypress/screenshots
+.Trash*
+
+# yarn artifacts, or "yartifacts"
+yarn-error.log
+
+# local configs
+wp-cli.local.yml
+
+# documentation
+/docs/_book/
+/docs/reference/*.md
+/docs/node_modules/
+
+# Various IDEs
+.idea
+.vscode
+nbproject
