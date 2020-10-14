@@ -1,5 +1,7 @@
 # Greg
 
+![Build Status](https://api.travis-ci.org/sitecrafting/greg.svg?branch=main)
+
 A de-coupled calendar solution for WordPress and Timber
 
 ## Installation
