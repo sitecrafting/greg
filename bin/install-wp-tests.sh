@@ -35,8 +35,8 @@ DB_NAME=${DB_NAME:-'test'}
 DB_USER=${DB_USER:-'test'}
 DB_PASS=${DB_PASS:-'test'}
 
-WP_TESTS_DIR=/app/test/wp-tests-lib
-WP_CORE_DIR=/app/test/wp
+WP_TESTS_DIR=test/wp-tests-lib
+WP_CORE_DIR=test/wp
 WP_TESTS_TAG='tags/5.5.1'
 
 # deletes the entire tmp dir so we can reinstall test suite
