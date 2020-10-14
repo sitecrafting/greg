@@ -27,5 +27,5 @@ install:
 script:
   - vendor/bin/phpunit --group unit
   # TODO integration tests
-  - ./vendor/bin/phpcs --standard=./phpcs.xml test lib
+  - ./vendor/bin/phpcs --standard=./phpcs.xml test/unit test/integration src
   - vendor/bin/phpstan analyse
