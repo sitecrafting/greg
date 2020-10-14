@@ -15,8 +15,14 @@ cache:
 
 # TODO maybe test building docs at some point
 
+addons:
+  apt:
+    packages:
+      - subversion
+
 install:
   - composer install --no-interaction --prefer-dist
+  - bin/install-wp-tests.sh
 
 script:
   - vendor/bin/phpunit --group unit
