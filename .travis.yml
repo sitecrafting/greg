@@ -4,6 +4,8 @@ language: php
 os:
   - linux
 dist: bionic
+services:
+  - mysql
 
 php:
   # TODO PHP 8.0
@@ -20,9 +22,13 @@ addons:
     packages:
       - subversion
 
+before_install:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+  - mysql -e 'GRANT ALL PRIVILEGES ON test.* TO test@localhost IDENTIFIED BY "test";'
+
 install:
   - composer install --no-interaction --prefer-dist
-  - bin/install-wp-tests.sh
+  - DB_HOST=127.0.0.1 DB_NAME=test DB_USER=test DB_PASS=test bin/install-wp-tests.sh
 
 script:
   - vendor/bin/phpunit --group unit

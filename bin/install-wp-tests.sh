@@ -29,11 +29,11 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-# NOTE: These need to match the dbtest creds defined in the Landofile
-DB_HOST='testdb'
-DB_NAME='test'
-DB_USER='test'
-DB_PASS='test'
+# NOTE: For local dev, these need to match the dbtest creds defined in the Landofile
+DB_HOST=${DB_HOST:-'testdb'}
+DB_NAME=${DB_NAME:-'test'}
+DB_USER=${DB_USER:-'test'}
+DB_PASS=${DB_PASS:-'test'}
 
 WP_TESTS_DIR=/app/test/wp-tests-lib
 WP_CORE_DIR=/app/test/wp
