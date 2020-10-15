@@ -31,7 +31,6 @@ Greg is PSR-4 compliant, so assuming you've required your `vendor/autoload.php` 
 * PHP >= 7.4
 * WordPress Core >= 5.5.1
 * Timber >= 2.0
-* Conifer >= 1.0
 
 ## Basic Usage
 
