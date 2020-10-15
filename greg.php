@@ -27,6 +27,58 @@ define('GREG_PLUGIN_JS_ROOT', GREG_PLUGIN_WEB_PATH . 'js');
 define('GREG_PLUGIN_VIEW_PATH', __DIR__ . '/views');
 
 
+add_action('init', function() {
+  register_post_type('greg_event', [
+    'public'                  => true,
+    'description'             => 'Calendar Events, potentially with recurrences',
+    'hierarchical'            => false,
+    'labels'                  => [
+      'name'                  => 'Events',
+      'singular_name'         => 'Event',
+      'add_new_item'          => 'Schedule New Event',
+      'edit_item'             => 'Edit Event',
+      'new_item'              => 'New Event',
+      'view_item'             => 'View Event',
+      'view_items'            => 'View Events',
+      'search_items'          => 'Search Events',
+      'not_found'             => 'No Events found',
+      'not_found_in_trash'    => 'No Events found in trash',
+      'all_items'             => 'All Events',
+      'archives'              => 'Event Archives',
+      'attributes'            => 'Event Attributes',
+      'insert_into_item'      => 'Insert into Event',
+      'uploaded_to_this_item' => 'Uploaded to this Event',
+    ],
+    'menu_icon'               => 'dashicons-calendar',
+    'has_archive'             => true, // TODO do we want this?
+  ]);
+
+  register_taxonomy('greg_event_category', ['greg_event'], [
+    'public'                       => true,
+    'labels'                       => [
+      'name'                       => 'Event Categories',
+      'singular_name'              => 'Event',
+      'menu_name'                  => 'Event Categories',
+      'all_items'                  => 'All Event Categories',
+      'edit_item'                  => 'Edit Event',
+      'view_item'                  => 'View Event',
+      'update_item'                => 'Update Event',
+      'add_new_item'               => 'Add New Event',
+      'new_item_name'              => 'New Event Name',
+      'parent_item'                => 'Parent Event',
+      'parent_item_colon'          => 'Parent Event:',
+      'search_items'               => 'Search Event Categories',
+      'popular_items'              => 'Popular Event Categories',
+      'separate_items_with_commas' => 'Separate Event Categories with commas',
+      'add_or_remove_items'        => 'Add or remove Event Categories',
+      'choose_from_most_used'      => 'Choose from the most used Event Categories',
+      'not_found'                  => 'No Event Categories found',
+      'back_to_items'              => '← Back to Event Categories',
+    ],
+  ]);
+});
+
+
 /*
  * Add REST Routes
  */
