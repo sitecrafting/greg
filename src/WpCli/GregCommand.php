@@ -42,7 +42,7 @@ class GregCommand {
    * @subcommand thing
    * @when after_wp_load
    */
-  public function thing(array $args, array $options) {
+  public function thing(array $args, array $options) : void {
     WP_CLI::success(sprintf('You passed: %s', $args[0]));
   }
 }

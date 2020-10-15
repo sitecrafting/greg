@@ -1,8 +1,9 @@
 includes:
   - vendor/szepeviktor/phpstan-wordpress/extension.neon
 parameters:
-  level: 1
+  level: max
   inferPrivatePropertyTypeFromConstructor: true
+  checkMissingIterableValueType: false
   bootstrapFiles:
     - phpstan/bootstrap.php
   paths:

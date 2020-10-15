@@ -9,18 +9,11 @@
 namespace Greg\Unit;
 
 use PHPUnit\Framework\TestCase;
-use WP_Mock;
 
 /**
  * Base test class for the unit test suite. Declared abstract so that PHPUnit
  * doesn't complain about a lack of tests defined here.
  */
 abstract class BaseTest extends TestCase {
-  public function setUp() : void {
-    WP_Mock::setUp();
-  }
-
-  public function tearDown() : void {
-    WP_Mock::tearDown();
-  }
+  /* shared test code goes here */
 }

@@ -95,12 +95,12 @@ tooling:
   analyze:
     service: appserver
     cmd: './vendor/bin/phpstan analyse'
-    description: 'Run phpstan coding standards (level 1)'
+    description: 'Run phpstan coding standards (highest level)'
 
   analyse:
     service: appserver
     cmd: './vendor/bin/phpstan analyse'
-    description: 'Run phpstan coding standards (level 1)'
+    description: 'Run phpstan coding standards (highest level)'
 
   phpstan:
     service: appserver

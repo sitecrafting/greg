@@ -34,7 +34,7 @@ class RestController {
   /**
    * Handler for the /thing endpoint
    *
-   * @param WP_REST_Request the REST request
+   * @param WP_REST_Request $request the REST request
    * @return WP_REST_Response a REST response
    */
   public function thing_action(WP_REST_Request $request) : WP_REST_Response {
