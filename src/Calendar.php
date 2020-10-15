@@ -3,7 +3,7 @@
 /**
  * Greg\Calendar class
  *
- * @copyright 2019 SiteCrafting, Inc.
+ * @copyright 2020 SiteCrafting, Inc.
  * @author    Coby Tamayo <ctamayo@sitecrafting.com>
  */
 
