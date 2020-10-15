@@ -2,15 +2,226 @@
 
 ![Build Status](https://api.travis-ci.org/sitecrafting/greg.svg?branch=main)
 
-A de-coupled calendar solution for WordPress and Timber
+A de-coupled calendar solution for WordPress and Timber. Leverage [RRULE](https://github.com/rlanvin/php-rrule) to store only the recurrence rules for your recurring events. Supports one-time and recurring events.
 
 ## Installation
 
-TODO
+### Manual Installation
+
+Go to the GitHub [releases page](https://github.com/sitecrafting/greg/releases/) and download the .zip archive of the latest release. Make sure you download the release archive, **not** the source code archive. For example, if the latest release is called `v2.x.x`, click the download link that says **greg-v0.x.x.zip**. (You can also use the `tar.gz` archive if you want - they are the same code.)
+
+Once downloaded and unzipped, place the extracted directory in `wp-content/plugins`. Activate the plugin from the WP Admin as you normally would.
+
+### Composer (advanced)
+
+Add to composer.json:
+
+```sh
+composer require sitecrafting/greg
+```
+
+Greg is PSR-4 compliant, so assuming you've required your `vendor/autoload.php` as you normally would, you can `use Greg\*` classes from anywhere.
+
+## Requirements
+
+* PHP >= 7.4
+* WordPress Core >= 5.5.1
+* Timber >= 2.0
+* Conifer >= 1.0
+
+## Basic Usage
+
+Greg is built to have no opinion about what your site looks like, and is solely concerned with making your event data easier to work with. You store RRULE data for each event describing:
+
+* start/end dates
+* recurrence frequency
+* recurrence length (i.e. recurs **until**)
+* any exceptions to the recurrence rules (e.g. every Friday **except** 2020-11-13)
+
+The only assumption about your data is that. Using a simple API, you tell Greg how to find this data. Later, at query time, you ask Greg for certain events (matching time-based/category criteria, and any other criteria you like) and it gives you back **all** recurrences of **all** matching events it finds.
+
+### Conceptual example
+
+Say you have the following events:
+
+* **Hip-hop Dance Nights**: starts Jan 1 and recurs **weekly** at 5pm until Jan 22
+* **Karate Tournament**: starts Jan 3 and recurs **daily** at 10am until Jan 6
+* **Troll 2 Screening**: **one night only** on Jan 4 at 9pm
+
+When you query for events in January, Greg gives you a `Greg\Event` object back **for each recurrence**:
+
+* **Hip-hop Dance** on Jan 1
+* **Karate Tournament** on Jan 3
+* **Karate Tournament** on Jan 4
+* **Troll 2 Screening** (after Karate Tournament, since it's later in the day)
+* **Karate Tournament** on Jan 5
+* **Karate Tournament** on Jan 6
+* **Hip-hop Dance** on Jan 8
+* **Hip-hop Dance** on Jan 15
+* **Hip-hop Dance** on Jan 22
+
+If you want to, you can also tell Greg to give you just the three Events, in case you want to display info about each series as a whole.
+
+### API example
+
+```php
+add_filter('greg/meta_keys', function() : array {
+  return [
+    'start'     => 'my_start_date_key',
+    'end'       => 'my_end_date_key',
+    'frequency' => 'my_frequency_key',
+    'until'     => 'my_until_key',
+  ];
+});
+```
+
+Greg uses this info to figure out how to do time-based queries for events, and also how to fetch recurrence rules a given event post.
+
+Now we're ready to actually fetch our posts. To do that we call `Greg::get_events()`, which is just like `Timber::get_posts()`, but with some syntax sugar for nice, concise queries:
+
+```php
+/* archive-greg_event.php */
+
+use Greg\Greg;
+use Timber\Timber;
+
+$event = Greg::get_events();
+
+$context = Timber::context();
+$context['posts'] = $events;
+
+Timber::render('archive-greg_event.twig', $context);
+```
+
+You can also specify month and/or event category:
+
+```php
+$events = Greg::get_events([
+  'event_month'    => '2020-11',
+  'event_category' => 'cool',
+  // OR by term_id:
+  // 'event_category' => 123,
+]);
+
+// Assuming the greg/meta_keys hook in the example above,
+// this query expands to:
+$events = Timber::get_posts([
+  'tax_query'  => [
+    [
+      'taxonomy' => 'greg_event_category',
+      'terms'    => ['cool'],
+      'field'    => 'slug',
+
+      // OR if you passed an int:
+      // 'terms' => [123],
+      // 'field' => 'term_id',
+
+      // OR if you passed an array of strings:
+      // 'terms' => ['array', 'of', 'slugs'],
+      // 'field' => 'slug',
+
+      // OR an array of ints:
+      // 'terms' => [123, 456],
+      // 'field' => 'term_id',
+    ],
+  ],
+  // NOTE: it uses meta_query and not date_query,
+  // since this is completetly different from post_date
+  'meta_query'   => [
+    'relation'   => 'AND',
+    [
+      'key'      => 'my_start_date_key',
+      'value'    => '2020-11-01',
+      'compare'  => '>=',
+      'type'     => 'DATETIME',
+    ],
+    // ... additional constraints by my_end_date_key here ...
+  ],
+]);
+```
+
+Passing a string for `greg_event_category` indicates it's a term slug; int means it's a `term_id`. You can also pass an array of strings or ints to query for events by any (inclusive) corresponding slugs/`term_id`s, respectively.
+
+Instead of `month`, you can also specify a date range via separate `start` and `end` params:
+
+```php
+Greg::get_events([
+  // Just picking some dates at random here, totally not preoccupied with anything...
+  'start'  => '2020-11-03',
+  'end'    => '2021-01-20',
+
+  // Other params...
+]);
+```
+
+The time-based filters `month` and `start`/`end` work independently of category, as you'd expect.
+
+### Querying for event series only
+
+By default, Greg will parse out any recurrence rules it finds and expand all recurring events out into their respective individual recurrences, finally sorting all recurrences by start date. But that may not be what you want all the time. You can tell Greg you only want the series, not the individual recurrences using the special `expand_recurrences` param set to `false`:
+
+```php
+Greg::get_events([
+  'expand_recurrences' => false
+]);
+```
+
+The `expand_recurrences` param composes with any other valid Greg/`WP_Query` params: that is, it doesn't actually affect the database query logic in any way, it just tells Greg to skip the step of expanding recurrences.
+
+### Additional params
+
+Any parameters not explicitly mentioned above get passed through as-is, so you can for example use the WordPress native `offset` param to exclude the first `$n` events from your results:
+
+```php
+Greg::get_events([
+  'event_month'  => '2020-11', // Greg expands this into a meta_query as usual.
+  'offset'       => 5,         // This gets passed straight through to WordPress.
+]);
+```
+
+If you specify any custom `meta_query` or `tax_query` params, Greg will merge them in with its own time-based/category sub-queries.
+
+### Performance
+
+Greg is currently not as optimized as it could be. Specifically, to fetch the actual it currently does a few database lookups for each recurring event in a result set. This is pretty typical of WordPress code, where you don't usually fetch meta data until after you've already queried for your post(s). But a faster way would be to map between a post ID and a recurrence ruleset in a *single* query result, so that for a collection of events of any size, we only need one round trip to the database. This would require some advanced logic to compile custom SQL clauses at query time, and may become available in a future version.
+
+For now, we recommend using Greg's Event Collection cache, which is enabled by default.
 
 ## Actions & Filters
 
-TODO
+### Event query params
+
+To make customizations across all Greg queries, you can hook into the `greg/query/params` filter. For example, say you just want a simple event series manager, and never need to list individual recurrences:
+
+```php
+add_filter('greg/query/params', function(array $params) : array {
+  $params['expand_recurrences'] = false;
+  return $params;
+});
+```
+
+The hook runs inside `Greg::get_events()` **before** the params are expanded into meta/taxonomy queries as described above, which is how it can honor special keys like `expand_recurrences`.
+
+### Query params: A more advanced example
+
+Say you have a custom `location` post type associated with each event by the meta_key `location_id`, and on single location pages you want to query only for events at that location. You can hook into Greg's query logic to accomplish this:
+
+```php
+add_filter('greg/query/params', function(array $params) : array {
+  if (is_single()) {
+    $params['meta_query'] = [
+      [
+        'key'   => 'location_id',
+        'value' => get_the_ID(),
+      ],
+    ];
+  }
+
+  return $params;
+});
+```
+
+Since Greg simply uses `Timber::get_posts()` under the hood, the array returned from this hook can be any valid arguments to [`WP_Query::__construct()`](https://developer.wordpress.org/reference/classes/wp_query/__construct/).
 
 ## Customization
 
@@ -21,7 +232,7 @@ Override template files from your theme by placing them in a directory called `g
 Greg comes with some custom WP-CLI tooling:
 
 ```sh
-wp greg
+wp greg # describe sub-commands
 ```
 
 (In the dev environment, prefix this with `lando` to run it inside Lando!)
@@ -43,3 +254,12 @@ lando unit # run unit tests
 lando integration # run integration tests
 lando test # run all tests
 ```
+
+## TODO
+
+- Performance optimization (see **Performance**, above)
+- REST endpoints
+- Default meta field keys (make the `greg/meta_keys` hook optional)
+- Default frontend code
+- Shortcodes for listing Events, listing Event Categories, Event Details, etc.
+- Actually implement it, lol
