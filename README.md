@@ -1,5 +1,9 @@
 # Greg
 
+> Cuz do you really wanna deal with The Events Calendar?
+>
+> -- Pope Gregory XIII
+
 ![Build Status](https://api.travis-ci.org/sitecrafting/greg.svg?branch=main)
 
 A de-coupled calendar solution for WordPress and Timber. Leverage [RRULE](https://github.com/rlanvin/php-rrule) to store only the recurrence rules for your recurring events. Supports one-time and recurring events.
