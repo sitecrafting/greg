@@ -226,10 +226,6 @@ add_filter('greg/query/params', function(array $params) : array {
 
 Since Greg simply uses `Timber::get_posts()` under the hood, the array returned from this hook can be any valid arguments to [`WP_Query::__construct()`](https://developer.wordpress.org/reference/classes/wp_query/__construct/).
 
-## Customization
-
-Override template files from your theme by placing them in a directory called `greg`.
-
 ## Command Line Interface (CLI)
 
 Greg comes with some custom WP-CLI tooling:
