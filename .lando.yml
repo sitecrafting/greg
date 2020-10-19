@@ -29,19 +29,6 @@ services:
       password: test
       database: test
 
-  gitbook:
-    type: node:14
-
-  mailhog:
-    type: mailhog:v1.0.0
-    hogfrom:
-      - appserver
-
-  docs:
-    type: nginx:1.18
-    ssl: true
-    webroot: docs/_book
-
 tooling:
   clean:
     service: appserver
@@ -107,11 +94,6 @@ tooling:
     cmd: './vendor/bin/phpstan'
     description: 'Run phpstan commands for static analysis'
 
-  docs:
-    service: gitbook
-    cmd: './bin/build-docs.sh ./docs'
-    description: 'Build documentation in _book folder using Gitbook'
-
   gitbook:
     service: gitbook
     cmd: 'yarn gitbook'
@@ -120,9 +102,3 @@ tooling:
 proxy:
   appserver:
     - greg.lndo.site
-
-  mailhog:
-    - mail.greg.lndo.site
-
-  docs:
-    - docs.greg.lndo.site
