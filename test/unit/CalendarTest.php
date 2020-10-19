@@ -14,6 +14,8 @@ use Greg\Calendar;
 /**
  * Test case for the core Calendar library, where we generate recurring event
  * post data.
+ *
+ * @group unit
  */
 class CalendarTest extends BaseTest {
   public function test_recurrences_with_unique_event() {
