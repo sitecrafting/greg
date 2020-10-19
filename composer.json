@@ -34,7 +34,8 @@
   "autoload": {
     "psr-4": {
       "Greg\\": "src/"
-    }
+    },
+    "files": ["src/api.php"]
   },
   "scripts": {
     "unit": [

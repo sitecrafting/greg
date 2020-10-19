@@ -195,6 +195,85 @@ You can disable Greg's query cache with the `greg/query/enable_cache` filter:
 add_filter('greg/query/enable_cache', '__return_false');
 ```
 
+### Templates & Views
+
+Greg takes full advantage of Timber's use of the [Twig template engine](https://twig.symfony.com/). While Greg's frontend code is completely optional, the basic views provided are useful out of the box and are completely customizable.
+
+#### Rendering
+
+You can render a Twig view from PHP with the `Greg\render()` function:
+
+```php
+use Greg;
+
+Greg\render('event-categories.twig');
+```
+
+Note that unlike `Timber::render()`, a static method on the Timber class, this is a plain PHP function in the `Greg` namespace, hence the backslash notation `Greg\render()` instead of the double-colon.
+
+Like `Timber::render()`, it takes an optional array of data to pass to the Twig view:
+
+```php
+use Greg;
+
+Greg\render('event-categories.twig', [
+  'extra' => 'stuff',
+]);
+```
+
+You don't need to this unless you're overriding Greg's views from your theme  (and in fact passing extra data to the default views has no effect, since they don't care about the extra data passed to them). More on that below.
+
+There is also a `Greg\compile()` method which returns the compiled string instead of just echoing it, in a way exactly analogous to the `Timber::compile()`.
+
+To render a view straight from your own Twig view, use the `greg_render()` Twig function:
+
+```twig
+<aside class="event-cats-container">
+  {{ greg_render('event-categories.twig') }}
+</aside>
+```
+
+As with the `Greg/render()` PHP function, you can pass extra data:
+
+```twig
+<aside class="event-cats-container">
+  {{ greg_render('event-categories.twig'), { extra: 'stuff' } }}
+</aside>
+```
+
+### Overriding Greg's views
+
+A view can be overridden from your theme simply by placing it at a specific path relative to your theme route. For example, by placing a file at `./views/greg/event-categories.twig`, you tell Greg to render your theme's `event-categories` view instead of Greg's built-in one.
+
+Greg transparently passes any extra data you pass to `greg_render`/`Greg\render()`:
+
+```twig
+{# views/greg.twig #}
+<div class="event-cats">
+  {# render each event cat here... #}
+  
+  {# extra data passed to greg_render() #}
+  <p>{{ extra }}</p>
+</div>
+```
+
+
+
+#### Providing and overriding view data
+
+Use the `greg/render/$view_name.twig` filter to override data that gets passed to **any** Greg view, any time it's rendered:
+
+```php
+add_filter('greg/render/event-categories.twig', function(array $data) : array {
+  // add some extra stuff any time event-categories.twig gets rendered
+  return array_merge($data, [
+    'extra' => 'stuff',
+  ]);
+});
+```
+
+
+
 ## Actions & Filters
 
 ### Event query params

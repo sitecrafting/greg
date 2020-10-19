@@ -2,6 +2,7 @@
 
 /**
  * Plugin Name: Greg
+ * Plugin URI: https://github.com/sitecrafting/greg
  * Author: SiteCrafting
  * Author URI: https://www.sitecrafting.com/
  * Description: A de-coupled calendar solution for WordPress and Timber
@@ -18,6 +19,10 @@ if (!defined('ABSPATH')) {
 if (file_exists(__DIR__ . '/vendor/autoload.php')) {
   require_once __DIR__ . '/vendor/autoload.php';
 }
+
+use Timber\Timber;
+use Twig\TwigFunction;
+use Twig\Environment;
 
 use Greg\Rest\RestController;
 use Greg\WpCli\GregCommand;
@@ -136,3 +141,31 @@ add_filter('greg/render', function($tpl, $data = []) {
   }
 }, 10, 2);
 
+/**
+ * Merges in default data for the event-categories.twig view.
+ */
+add_filter('greg/render/event-categories.twig', function(array $data) : array {
+  return array_merge($data, [
+    'term'         => Timber::get_term(),
+    'terms'        => Timber::get_terms([
+      'taxonomy'   => 'greg_event_category',
+      'hide_empty' => false,
+    ]),
+  ]);
+});
+
+add_filter('timber/locations', function(array $paths) {
+  $paths['greg'] = [
+    get_template_directory() . '/views/greg',
+    GREG_PLUGIN_VIEW_PATH . '/twig',
+  ];
+
+  return $paths;
+});
+
+add_filter('timber/twig', function(Environment $twig) {
+  $twig->addFunction(new TwigFunction('greg_compile', Greg\compile::class));
+  $twig->addFunction(new TwigFunction('greg_render', Greg\render::class));
+
+  return $twig;
+});
