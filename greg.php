@@ -37,6 +37,9 @@ add_action('init', function() {
     'public'                  => true,
     'description'             => 'Calendar Events, potentially with recurrences',
     'hierarchical'            => false,
+    'rewrite'                 => [
+      'slug'                  => 'event',
+    ],
     'labels'                  => [
       'name'                  => 'Events',
       'singular_name'         => 'Event',
@@ -60,6 +63,9 @@ add_action('init', function() {
 
   register_taxonomy('greg_event_category', ['greg_event'], [
     'public'                       => true,
+    'rewrite'                      => [
+      'slug'                       => 'event-category',
+    ],
     'labels'                       => [
       'name'                       => 'Event Categories',
       'singular_name'              => 'Event',
@@ -142,9 +148,9 @@ add_filter('greg/render', function($tpl, $data = []) {
 }, 10, 2);
 
 /**
- * Merges in default data for the event-categories.twig view.
+ * Merges in default data for the event-categories-list.twig view.
  */
-add_filter('greg/render/event-categories.twig', function(array $data) : array {
+add_filter('greg/render/event-categories-list.twig', function(array $data) : array {
   return array_merge($data, [
     'term'         => Timber::get_term(),
     'terms'        => Timber::get_terms([
