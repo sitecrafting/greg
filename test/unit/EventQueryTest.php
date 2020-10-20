@@ -31,6 +31,22 @@ class EventQueryTest extends BaseTest {
       'compare' => '>=',
       'type'    => 'DATETIME',
     ], $query->params()['meta_query'][0]);
+    $this->assertEquals([
+      'relation' => 'OR',
+      // Include events up to the end of the current month
+      [
+        'key'     => 'end_date',
+        'value'   => '2020-10-31 23:59:59',
+        'compare' => '<=',
+        'type'    => 'DATETIME',
+      ],
+      [
+        'key'     => 'until',
+        'value'   => '2020-10-31 23:59:59',
+        'compare' => '<=',
+        'type'    => 'DATETIME',
+      ],
+    ], $query->params()['meta_query'][1]);
   }
 
   public function test_params_truncating_event_month() {
@@ -48,6 +64,22 @@ class EventQueryTest extends BaseTest {
       'compare' => '>=',
       'type'    => 'DATETIME',
     ], $query->params()['meta_query'][0]);
+    $this->assertEquals([
+      'relation' => 'OR',
+      // Include events up to the end of the current month
+      [
+        'key'     => 'end_date',
+        'value'   => '2020-10-31 23:59:59',
+        'compare' => '<=',
+        'type'    => 'DATETIME',
+      ],
+      [
+        'key'     => 'until',
+        'value'   => '2020-10-31 23:59:59',
+        'compare' => '<=',
+        'type'    => 'DATETIME',
+      ],
+    ], $query->params()['meta_query'][1]);
   }
 
   public function test_params_outside_current_month() {
@@ -64,6 +96,22 @@ class EventQueryTest extends BaseTest {
       'compare' => '>=',
       'type'    => 'DATETIME',
     ], $query->params()['meta_query'][0]);
+    $this->assertEquals([
+      'relation' => 'OR',
+      // Include events up to the end of the current month
+      [
+        'key'     => 'end_date',
+        'value'   => '2020-09-30 23:59:59',
+        'compare' => '<=',
+        'type'    => 'DATETIME',
+      ],
+      [
+        'key'     => 'until',
+        'value'   => '2020-09-30 23:59:59',
+        'compare' => '<=',
+        'type'    => 'DATETIME',
+      ],
+    ], $query->params()['meta_query'][1]);
   }
 
   public function test_params_garbage_event_month() {
@@ -78,6 +126,22 @@ class EventQueryTest extends BaseTest {
       'compare' => '>=',
       'type'    => 'DATETIME',
     ], $query->params()['meta_query'][0]);
+    $this->assertEquals([
+      'relation' => 'OR',
+      // Include events up to the end of the current month
+      [
+        'key'     => 'end_date',
+        'value'   => '2020-10-31 23:59:59',
+        'compare' => '<=',
+        'type'    => 'DATETIME',
+      ],
+      [
+        'key'     => 'until',
+        'value'   => '2020-10-31 23:59:59',
+        'compare' => '<=',
+        'type'    => 'DATETIME',
+      ],
+    ], $query->params()['meta_query'][1]);
   }
 
   public function test_params_start_date() {
@@ -92,5 +156,52 @@ class EventQueryTest extends BaseTest {
       'compare' => '>=',
       'type'    => 'DATETIME',
     ], $query->params()['meta_query'][0]);
+    $this->assertEquals([
+      'relation' => 'OR',
+      // Include events up to the end of the current month
+      [
+        'key'     => 'end_date',
+        'value'   => '2020-10-31 23:59:59',
+        'compare' => '<=',
+        'type'    => 'DATETIME',
+      ],
+      [
+        'key'     => 'until',
+        'value'   => '2020-10-31 23:59:59',
+        'compare' => '<=',
+        'type'    => 'DATETIME',
+      ],
+    ], $query->params()['meta_query'][1]);
+  }
+
+  public function test_params_start_and_end_dates() {
+    $query = new EventQuery([
+      'current_time' => '2020-10-15 16:20:00',
+      'start_date'   => '2020-10-03',
+      'end_date'     => '2020-11-03',
+    ]);
+
+    $this->assertEquals([
+      'key'     => 'start_date',
+      'value'   => '2020-10-03 00:00:00',
+      'compare' => '>=',
+      'type'    => 'DATETIME',
+    ], $query->params()['meta_query'][0]);
+    $this->assertEquals([
+      'relation' => 'OR',
+      // Include events up to the end of the current month
+      [
+        'key'     => 'end_date',
+        'value'   => '2020-11-03 23:59:59',
+        'compare' => '<=',
+        'type'    => 'DATETIME',
+      ],
+      [
+        'key'     => 'until',
+        'value'   => '2020-11-03 23:59:59',
+        'compare' => '<=',
+        'type'    => 'DATETIME',
+      ],
+    ], $query->params()['meta_query'][1]);
   }
 }
