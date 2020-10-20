@@ -57,6 +57,7 @@
         <exclude name="WordPress.Arrays.ArrayKeySpacingRestrictions" />
         <exclude name="WordPress.PHP.YodaConditions" />
         <exclude name="WordPress.PHP.DisallowShortTernary.Found" />
+        <exclude name="WordPress.Security.EscapeOutput.OutputNotEscaped" />
         <exclude name="WordPress.WhiteSpace.ArbitraryParenthesesSpacing.SpaceAfterOpen" />
         <exclude name="WordPress.WhiteSpace.ArbitraryParenthesesSpacing.SpaceBeforeClose" />
         <exclude name="WordPress.WhiteSpace.CastStructureSpacing.NoSpaceBeforeOpenParenthesis" />
