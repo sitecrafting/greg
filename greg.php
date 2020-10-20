@@ -107,46 +107,6 @@ if (defined('WP_CLI') && WP_CLI) {
   WP_CLI::add_command('greg', $command);
 }
 
-add_action('wp_enqueue_scripts', function() {
-  wp_enqueue_script(
-    'greg',
-    GREG_PLUGIN_WEB_PATH . 'js/greg.js',
-    [], // deps
-    false, // default to current WP version
-    true // render in footer
-  );
-});
-
-add_action('wp_enqueue_scripts', function() {
-  wp_enqueue_script(
-    'greg',
-    GREG_PLUGIN_WEB_PATH . 'js/greg.js',
-    [], // deps
-    false, // default to current WP version
-    true // render in footer
-  );
-});
-
-/**
- * Example:
- *
- * apply_filters('greg/render', ['my_string' => 'Hello, World!']);
- */
-add_filter('greg/render', function($tpl, $data = []) {
-  // Allow for theme overrides
-  $path = get_template_directory() . '/greg/' . $tpl;
-
-  if (!file_exists($path)) {
-    $path = GREG_PLUGIN_VIEW_PATH . $tpl;
-  }
-
-  if (file_exists($path)) {
-    ob_start();
-    require $path;
-    return ob_get_clean();
-  }
-}, 10, 2);
-
 /**
  * Merges in default data for the event-categories-list.twig view.
  */
