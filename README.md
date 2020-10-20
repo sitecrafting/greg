@@ -199,7 +199,7 @@ add_filter('greg/query/enable_cache', '__return_false');
 
 Greg takes full advantage of Timber's use of the [Twig template engine](https://twig.symfony.com/). While Greg's frontend code is completely optional, the basic views provided are useful out of the box and are completely customizable.
 
-#### Rendering
+#### In PHP: `Greg\render()`
 
 You can render a Twig view from PHP with the `Greg\render()` function:
 
@@ -221,11 +221,13 @@ Greg\render('event-categories.twig', [
 ]);
 ```
 
-You don't need to this unless you're overriding Greg's views from your theme  (and in fact passing extra data to the default views has no effect, since they don't care about the extra data passed to them). More on that below.
+You don't need to do this unless you're overriding Greg's views from your theme  (and in fact passing extra data to the default views has no effect, since they don't care about the extra data passed to them). More on that below.
 
-There is also a `Greg\compile()` method which returns the compiled string instead of just echoing it, in a way exactly analogous to the `Timber::compile()`.
+There is also a `Greg\compile()` method which returns the compiled string instead of just echoing it, in a way exactly analogous to the `Timber::compile()` method.
 
-To render a view straight from your own Twig view, use the `greg_render()` Twig function:
+#### In Twig: `greg_render()`
+
+To render a view straight from Twig code, use the `greg_render()` Twig function:
 
 ```twig
 <aside class="event-cats-container">
@@ -257,8 +259,6 @@ Greg transparently passes any extra data you pass to `greg_render`/`Greg\render(
 </div>
 ```
 
-
-
 #### Providing and overriding view data
 
 Use the `greg/render/$view_name.twig` filter to override data that gets passed to **any** Greg view, any time it's rendered:
@@ -272,7 +272,7 @@ add_filter('greg/render/event-categories.twig', function(array $data) : array {
 });
 ```
 
-
+Again, since the default views don't care about any extra data passed to them, you don't need to worry about this unless you are overriding Greg's views from your theme. Because you can always pass a data array directly to `greg_render()`/`Greg\render()`, this is an advanced use-case that you really only need if you want to customize view data **across all usage of a given view.**
 
 ## Actions & Filters
 
