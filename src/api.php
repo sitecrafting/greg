@@ -32,9 +32,9 @@ use Timber\Timber;
  * ```
  * @param string $view the name of the view
  * @param array $data optional data to pass to the view, as in Timber::render().
- * @return string the rendered markup
+ * @return bool|string the rendered markup, or false on failure
  */
-function compile(string $view, array $data = []) : string {
+function compile(string $view, array $data = []) {
   return Timber::compile(
     '@greg/' . $view,
     apply_filters('greg/render/' . $view, $data)
