@@ -80,15 +80,15 @@ add_filter('greg/meta_keys', function() : array {
 
 Greg uses this info to figure out how to do time-based queries for events, and also how to fetch recurrence rules a given event post.
 
-Now we're ready to actually fetch our posts. To do that we call `Greg::get_events()`, which is just like `Timber::get_posts()`, but with some syntax sugar for nice, concise queries:
+Now we're ready to actually fetch our posts. To do that we call `Greg\get_events()`, which is just like `Timber::get_posts()`, but with some syntax sugar for nice, concise queries:
 
 ```php
 /* archive-greg_event.php */
 
-use Greg\Greg;
+use Greg;
 use Timber\Timber;
 
-$event = Greg::get_events();
+$event = Greg\get_events();
 
 $context = Timber::context();
 $context['posts'] = $events;
@@ -99,7 +99,7 @@ Timber::render('archive-greg_event.twig', $context);
 You can also specify month and/or event category:
 
 ```php
-$events = Greg::get_events([
+$events = Greg\get_events([
   'event_month'    => '2020-11',
   'event_category' => 'cool',
   // OR by term_id:
@@ -148,7 +148,7 @@ Passing a string for `greg_event_category` indicates it's a term slug; int means
 Instead of `month`, you can also specify a date range via separate `start` and `end` params:
 
 ```php
-Greg::get_events([
+Greg\get_events([
   // Just picking some dates at random here, totally not preoccupied with anything...
   'start'  => '2020-11-03',
   'end'    => '2021-01-20',
@@ -164,7 +164,7 @@ The time-based filters `month` and `start`/`end` work independently of category,
 By default, Greg will parse out any recurrence rules it finds and expand all recurring events out into their respective individual recurrences, finally sorting all recurrences by start date. But that may not be what you want all the time. You can tell Greg you only want the series, not the individual recurrences, using the special `expand_recurrences` param set to `false`:
 
 ```php
-Greg::get_events([
+Greg\get_events([
   'expand_recurrences' => false
 ]);
 ```
@@ -175,7 +175,7 @@ The `expand_recurrences` param composes with any other valid Greg/`WP_Query` par
 Any parameters not explicitly mentioned above get passed through as-is, so you can for example use the WordPress native `offset` param to exclude the first five events from your results:
 
 ```php
-Greg::get_events([
+Greg\get_events([
   'event_month'  => '2020-11', // Greg expands this into a meta_query as usual.
   'offset'       => 5,         // This gets passed straight through to WordPress.
 ]);
@@ -235,7 +235,7 @@ To render a view straight from Twig code, use the `greg_render()` Twig function:
 </aside>
 ```
 
-As with the `Greg/render()` PHP function, you can pass extra data:
+As with the `Greg\render()` PHP function, you can pass extra data:
 
 ```twig
 <aside class="event-cats-container">
@@ -253,7 +253,7 @@ Greg transparently passes any extra data you pass to `greg_render`/`Greg\render(
 {# views/greg.twig #}
 <div class="event-cats">
   {# render each event cat here... #}
-  
+
   {# extra data passed to greg_render() #}
   <p>{{ extra }}</p>
 </div>
@@ -287,7 +287,7 @@ add_filter('greg/query/params', function(array $params) : array {
 });
 ```
 
-The hook runs inside `Greg::get_events()` **before** the params are expanded into meta/taxonomy queries as described above, which is how it can honor special keys like `expand_recurrences`.
+The hook runs inside `Greg\get_events()` **before** the params are expanded into meta/taxonomy queries as described above, which is how it can honor special keys like `expand_recurrences`.
 
 ### Query params: A more advanced example
 

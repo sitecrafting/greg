@@ -9,6 +9,7 @@
 
 namespace Greg;
 
+use InvalidArgumentException;
 use Timber\Timber;
 
 /**
@@ -65,4 +66,49 @@ function compile(string $view, array $data = []) {
  */
 function render(string $view, array $data = []) : void {
   echo compile($view, $data);
+}
+
+/**
+ * Query Events by month, date range, category, or any other valid WP_Query
+ * params
+ *
+ * @example
+ * ```php
+ * // Default: All events this month
+ * $events = Greg\get_events();
+ *
+ * // Truncate this month's events to ones starting today at the earliest
+ * $events = Greg\get_events([
+ *   'truncate_current_month' => true,
+ * ]);
+ *
+ * // Skip expanding recurrences; get each event series as a whole
+ * $events = Greg\get_events([
+ *   'expand_recurrences' => false,
+ * ]);
+ *
+ * // Query by month
+ * $events = Greg\get_events([
+ *   'event_month' => '2020-03',
+ * ]);
+ * ```
+ * @param array $params event query params
+ * @return \Timber\PostCollection|false
+ */
+function get_events(array $params = []) {
+  $params = array_merge([
+    'current_time' => gmdate('Y-m-d H:i:s'),
+  ], $params);
+
+  try {
+    $query = new EventQuery($params);
+  } catch (InvalidArgumentException $e) {
+    do_action('greg/query/error', $e, [
+      'params' => $params,
+    ]);
+    return false;
+  }
+
+  // TODO db error handling
+  return $query->get_results();
 }

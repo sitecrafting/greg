@@ -10,6 +10,7 @@
 namespace Greg;
 
 use \DateTimeImmutable;
+use Timber\Timber;
 
 /**
  * Internal class for managing Event query logic
@@ -78,6 +79,15 @@ class EventQuery {
     }
 
     return date_create_immutable($params['start_date'] ?? $params['current_time']);
+  }
+
+  /**
+   * Get the results for this EventQuery as a collection of zero or more Events
+   *
+   * @internal
+   */
+  public function get_results() {
+    return Timber::get_posts($this->params());
   }
 
   /**

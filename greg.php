@@ -172,6 +172,7 @@ add_filter('timber/locations', function(array $paths) {
 add_filter('timber/twig', function(Environment $twig) {
   $twig->addFunction(new TwigFunction('greg_compile', Greg\compile::class));
   $twig->addFunction(new TwigFunction('greg_render', Greg\render::class));
+  $twig->addFunction(new TwigFunction('greg_get_events', Greg\get_events::class));
 
   return $twig;
 });
