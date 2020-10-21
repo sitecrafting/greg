@@ -93,6 +93,34 @@ class GregTest extends IntegrationTest {
     }
   }
 
+  public function test_get_events_with_recurrences_and_exceptions() {
+    $start   = date_create_immutable('now')->modify('+24 hours');
+    $end     = $start->modify('+25 hours');
+    $until   = $start->modify('+1 week');
+    $except1 = $start->modify('+48 hours');
+    $except2 = $start->modify('+120 hours');
+
+    $this->factory->post->create([
+      'post_type'  => 'greg_event',
+      'post_title' => 'My Single Event',
+      'meta_input' => [
+        'start_date' => $start->format('Y-m-d 00:00:00'),
+        'end_date'   => $end->format('Y-m-d 00:00:00'),
+        'frequency'  => 'DAILY',
+        'until'      => $until->format('Y-m-d 00:00:00'),
+        'exceptions' => [$except1->format('Y-m-d 00:00:00'), $except2->format('Y-m-d 00:00:00')],
+      ],
+    ]);
+
+    $events = Greg\get_events();
+
+    $this->assertCount(6, $events);
+    foreach ($events as $event) {
+      $this->assertInstanceOf(Event::class, $event);
+      $this->assertEquals('My Single Event', $event->title());
+    }
+  }
+
   public function test_get_events_skip_expansion() {
     $start = date_create_immutable('now')->modify('+24 hours');
     $end   = $start->modify('+25 hours');
