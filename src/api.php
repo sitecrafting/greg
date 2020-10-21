@@ -98,7 +98,7 @@ function render(string $view, array $data = []) : void {
 function get_events(array $params = []) {
   $params = array_merge([
     'current_time' => gmdate('Y-m-d H:i:s'),
-    // TODO meta_keys here
+    'meta_keys'    => apply_filters('greg/meta_keys', []),
   ], $params);
 
   try {
@@ -126,4 +126,30 @@ function get_events(array $params = []) {
   } else {
     return array_map([Event::class, 'from_post'], $events->to_array());
   }
+}
+
+/**
+ * Get the meta key for a given field
+ *
+ * @param string $field the field to get; one of:
+ * * start
+ * * end
+ * * until
+ * * frequency
+ * * exceptions
+ * * recurrence_descriptions
+ * @return string
+ * @throws InvalidArgumentException if passed a bad field name, or if the key
+ * does not exist in the configured greg/meta_fields hook.
+ */
+function meta_key(string $field) : string {
+  $key = apply_filters('greg/meta_keys', [])[$field] ?? false;
+  if (!$key) {
+    throw new InvalidArgumentException(sprintf(
+      'Key "%s" not found in the values returned from the greg/meta_keys filter.'
+      . ' Did you forget to return this key from your hook?',
+      $field
+    ));
+  }
+  return $key;
 }

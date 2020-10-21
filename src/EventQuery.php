@@ -74,6 +74,7 @@ class EventQuery {
     $this->end_date   = $this->init_end_date($params, $this->start_date);
     $this->params     = $params;
 
+    // Use fallback meta_key values.
     $this->meta_keys = [
       'start'      => $params['meta_keys']['start'] ?? 'start',
       'end'        => $params['meta_keys']['end'] ?? 'end',

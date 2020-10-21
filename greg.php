@@ -24,6 +24,7 @@ use Timber\Timber;
 use Twig\TwigFunction;
 use Twig\Environment;
 
+use Greg\Event;
 use Greg\Rest\RestController;
 use Greg\WpCli\GregCommand;
 
@@ -87,6 +88,14 @@ add_action('init', function() {
       'back_to_items'              => '← Back to Event Categories',
     ],
   ]);
+});
+
+
+/**
+ * Set up default meta_keys
+ */
+add_filter('greg/meta_keys', function() : array {
+  return Event::DEFAULT_META_KEYS;
 });
 
 
