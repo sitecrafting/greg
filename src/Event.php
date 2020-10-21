@@ -54,8 +54,8 @@ class Event implements CoreInterface {
     }
 
     return [
-      'start'                  => $event->meta('start_date'),
-      'end'                    => $event->meta('end_date'),
+      'start'                  => $event->meta('start'),
+      'end'                    => $event->meta('end'),
       'title'                  => $event->title(),
       'recurrence'             => $recurrence_rules,
       'recurrence_description' => $event->meta('recurrence_description'),

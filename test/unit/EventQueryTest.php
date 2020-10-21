@@ -27,7 +27,7 @@ class EventQueryTest extends BaseTest {
     $this->assertEquals([
       // Include events that started after the first of the current month
       // after midnight.
-      'key'     => 'start_date',
+      'key'     => 'start',
       'value'   => '2020-10-01 00:00:00',
       'compare' => '>=',
       'type'    => 'DATETIME',
@@ -36,7 +36,7 @@ class EventQueryTest extends BaseTest {
       'relation' => 'OR',
       // Include events up to the end of the current month
       [
-        'key'     => 'end_date',
+        'key'     => 'end',
         'value'   => '2020-10-31 23:59:59',
         'compare' => '<=',
         'type'    => 'DATETIME',
@@ -60,7 +60,7 @@ class EventQueryTest extends BaseTest {
     ]);
 
     $this->assertEquals([
-      'key'     => 'start_date',
+      'key'     => 'start',
       'value'   => '2020-10-15 00:00:00',
       'compare' => '>=',
       'type'    => 'DATETIME',
@@ -69,7 +69,7 @@ class EventQueryTest extends BaseTest {
       'relation' => 'OR',
       // Include events up to the end of the current month
       [
-        'key'     => 'end_date',
+        'key'     => 'end',
         'value'   => '2020-10-31 23:59:59',
         'compare' => '<=',
         'type'    => 'DATETIME',
@@ -92,7 +92,7 @@ class EventQueryTest extends BaseTest {
     $this->assertEquals([
       // Include events that started the first of start_date's month
       // at midnight, or later.
-      'key'     => 'start_date',
+      'key'     => 'start',
       'value'   => '2020-09-01 00:00:00',
       'compare' => '>=',
       'type'    => 'DATETIME',
@@ -101,7 +101,7 @@ class EventQueryTest extends BaseTest {
       'relation' => 'OR',
       // Include events up to the end of the current month
       [
-        'key'     => 'end_date',
+        'key'     => 'end',
         'value'   => '2020-09-30 23:59:59',
         'compare' => '<=',
         'type'    => 'DATETIME',
@@ -161,7 +161,7 @@ class EventQueryTest extends BaseTest {
     ]);
 
     $this->assertEquals([
-      'key'     => 'start_date',
+      'key'     => 'start',
       'value'   => '2020-10-03 00:00:00',
       'compare' => '>=',
       'type'    => 'DATETIME',
@@ -170,7 +170,7 @@ class EventQueryTest extends BaseTest {
       'relation' => 'OR',
       // Include events up to the end of the current month
       [
-        'key'     => 'end_date',
+        'key'     => 'end',
         'value'   => '2020-10-31 23:59:59',
         'compare' => '<=',
         'type'    => 'DATETIME',
@@ -192,7 +192,7 @@ class EventQueryTest extends BaseTest {
     ]);
 
     $this->assertEquals([
-      'key'     => 'start_date',
+      'key'     => 'start',
       'value'   => '2020-10-03 00:00:00',
       'compare' => '>=',
       'type'    => 'DATETIME',
@@ -201,7 +201,7 @@ class EventQueryTest extends BaseTest {
       'relation' => 'OR',
       // Include events up to the end of the current month
       [
-        'key'     => 'end_date',
+        'key'     => 'end',
         'value'   => '2020-11-03 23:59:59',
         'compare' => '<=',
         'type'    => 'DATETIME',

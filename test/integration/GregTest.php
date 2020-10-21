@@ -35,16 +35,16 @@ class GregTest extends IntegrationTest {
       'post_type'  => 'greg_event',
       'post_title' => 'My Old Event',
       'meta_input' => [
-        'start_date' => date_create_immutable('now')->modify('-6 weeks')->format('Y-m-d 00:00:00'),
-        'end_date'   => date_create_immutable('now')->modify('+5 weeks')->format('Y-m-d 00:00:00'),
+        'start'    => date_create_immutable('now')->modify('-6 weeks')->format('Y-m-d 00:00:00'),
+        'end'      => date_create_immutable('now')->modify('+5 weeks')->format('Y-m-d 00:00:00'),
       ],
     ]);
     $this->factory->post->create([
       'post_type'  => 'greg_event',
       'post_title' => 'My Upcoming Event',
       'meta_input' => [
-        'start_date' => date_create_immutable('now')->modify('+5 weeks')->format('Y-m-d 00:00:00'),
-        'end_date'   => date_create_immutable('now')->modify('+6 weeks')->format('Y-m-d 00:00:00'),
+        'start'    => date_create_immutable('now')->modify('+5 weeks')->format('Y-m-d 00:00:00'),
+        'end'      => date_create_immutable('now')->modify('+6 weeks')->format('Y-m-d 00:00:00'),
       ],
     ]);
 
@@ -56,8 +56,8 @@ class GregTest extends IntegrationTest {
       'post_type'  => 'greg_event',
       'post_title' => 'My Single Event',
       'meta_input' => [
-        'start_date' => date_create_immutable('now')->modify('+24 hours')->format('Y-m-d 00:00:00'),
-        'end_date'   => date_create_immutable('now')->modify('+27 hours')->format('Y-m-d 00:00:00'),
+        'start'    => date_create_immutable('now')->modify('+24 hours')->format('Y-m-d 00:00:00'),
+        'end'      => date_create_immutable('now')->modify('+27 hours')->format('Y-m-d 00:00:00'),
       ],
     ]);
 
@@ -74,13 +74,13 @@ class GregTest extends IntegrationTest {
     $until = $start->modify('+1 week');
 
     $this->factory->post->create([
-      'post_type'  => 'greg_event',
-      'post_title' => 'My Single Event',
-      'meta_input' => [
-        'start_date' => $start->format('Y-m-d 00:00:00'),
-        'end_date'   => $end->format('Y-m-d 00:00:00'),
-        'frequency'  => 'DAILY',
-        'until'      => $until->format('Y-m-d 00:00:00'),
+      'post_type'   => 'greg_event',
+      'post_title'  => 'My Recurring Event',
+      'meta_input'  => [
+        'start'     => $start->format('Y-m-d 00:00:00'),
+        'end'       => $end->format('Y-m-d 00:00:00'),
+        'frequency' => 'DAILY',
+        'until'     => $until->format('Y-m-d 00:00:00'),
       ],
     ]);
 
@@ -89,7 +89,7 @@ class GregTest extends IntegrationTest {
     $this->assertCount(8, $events);
     foreach ($events as $event) {
       $this->assertInstanceOf(Event::class, $event);
-      $this->assertEquals('My Single Event', $event->title());
+      $this->assertEquals('My Recurring Event', $event->title());
     }
   }
 
@@ -101,11 +101,11 @@ class GregTest extends IntegrationTest {
     $except2 = $start->modify('+120 hours');
 
     $this->factory->post->create([
-      'post_type'  => 'greg_event',
-      'post_title' => 'My Single Event',
-      'meta_input' => [
-        'start_date' => $start->format('Y-m-d 00:00:00'),
-        'end_date'   => $end->format('Y-m-d 00:00:00'),
+      'post_type'    => 'greg_event',
+      'post_title'   => 'My Recurring Event',
+      'meta_input'   => [
+        'start'      => $start->format('Y-m-d 00:00:00'),
+        'end'        => $end->format('Y-m-d 00:00:00'),
         'frequency'  => 'DAILY',
         'until'      => $until->format('Y-m-d 00:00:00'),
         'exceptions' => [$except1->format('Y-m-d 00:00:00'), $except2->format('Y-m-d 00:00:00')],
@@ -117,7 +117,7 @@ class GregTest extends IntegrationTest {
     $this->assertCount(6, $events);
     foreach ($events as $event) {
       $this->assertInstanceOf(Event::class, $event);
-      $this->assertEquals('My Single Event', $event->title());
+      $this->assertEquals('My Recurring Event', $event->title());
     }
   }
 
@@ -127,13 +127,13 @@ class GregTest extends IntegrationTest {
     $until = $start->modify('+1 week');
 
     $this->factory->post->create([
-      'post_type'  => 'greg_event',
-      'post_title' => 'My Single Event',
-      'meta_input' => [
-        'start_date' => $start->format('Y-m-d 00:00:00'),
-        'end_date'   => $end->format('Y-m-d 00:00:00'),
-        'frequency'  => 'DAILY',
-        'until'      => $until->format('Y-m-d 00:00:00'),
+      'post_type'   => 'greg_event',
+      'post_title'  => 'My Event Series',
+      'meta_input'  => [
+        'start'     => $start->format('Y-m-d 00:00:00'),
+        'end'       => $end->format('Y-m-d 00:00:00'),
+        'frequency' => 'DAILY',
+        'until'     => $until->format('Y-m-d 00:00:00'),
       ],
     ]);
 
@@ -143,6 +143,6 @@ class GregTest extends IntegrationTest {
 
     $this->assertCount(1, $events);
     $this->assertInstanceOf(Event::class, $events[0]);
-    $this->assertEquals('My Single Event', $events[0]->title());
+    $this->assertEquals('My Event Series', $events[0]->title());
   }
 }

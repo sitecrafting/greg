@@ -75,8 +75,8 @@ class EventQuery {
     $this->params     = $params;
 
     $this->meta_keys = [
-      'start_date' => $params['meta_keys']['start_date'] ?? 'start_date',
-      'end_date'   => $params['meta_keys']['end_date'] ?? 'end_date',
+      'start'      => $params['meta_keys']['start'] ?? 'start',
+      'end'        => $params['meta_keys']['end'] ?? 'end',
       'until'      => $params['meta_keys']['until'] ?? 'until',
       'frequency'  => $params['meta_keys']['frequency'] ?? 'frequency',
       'exceptions' => $params['meta_keys']['exceptions'] ?? 'exceptions',
@@ -169,7 +169,7 @@ class EventQuery {
     $start = $this->start_date();
     if ($start) {
       $meta[] = [
-        'key'     => $this->meta_keys['start_date'],
+        'key'     => $this->meta_keys['start'],
         'value'   => $start,
         'compare' => '>=',
         'type'    => 'DATETIME',
@@ -181,7 +181,7 @@ class EventQuery {
       $meta[] = [
         'relation' => 'OR',
         [
-          'key'     => $this->meta_keys['end_date'],
+          'key'     => $this->meta_keys['end'],
           'value'   => $end,
           'compare' => '<=',
           'type'    => 'DATETIME',
