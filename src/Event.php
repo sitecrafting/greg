@@ -9,6 +9,8 @@
 
 namespace Greg;
 
+use DateTimeImmutable;
+use InvalidArgumentException;
 use Timber\CoreInterface;
 use Timber\Post;
 
@@ -44,6 +46,27 @@ class Event implements CoreInterface {
    * @var array
    */
   protected $fallbacks;
+
+  /**
+   * Internal start datetime
+   *
+   * @var DateTimeImmutable
+   */
+  protected $start_datetime;
+
+  /**
+   * Internal end datetime
+   *
+   * @var DateTimeImmutable
+   */
+  protected $end_datetime;
+
+  /**
+   * Internal until datetime
+   *
+   * @var DateTimeImmutable|false
+   */
+  protected $until_datetime;
 
   /**
    * Create a new Event wrapper object to wrap an event Post
@@ -153,6 +176,53 @@ class Event implements CoreInterface {
 
 
   /**
+   * Start date/time, optionally formatted
+   *
+   * @param string $format optional date string format string, defaults to global
+   * WordPress date_format and time_format options, separated by a space
+   * @return string
+   */
+  public function start(string $format = '') : string {
+    // TODO improve flexibility of this with filters
+    $format = $format
+      ?: get_option('date_format') . ' ' . get_option('time_format');
+    return $this->start_datetime()->format($format);
+  }
+
+  /**
+   * End date/time, optionally formatted
+   *
+   * @param string $format optional date string format string, defaults to global
+   * WordPress time_format option
+   * @return string
+   */
+  public function end(string $format = '') : string {
+    // TODO improve flexibility of this with filters
+    $format = $format
+      ?: get_option('time_format');
+    return $this->end_datetime()->format($format);
+  }
+
+  /**
+   * Until date/time, optionally formatted
+   *
+   * @param string $format optional date string format string, defaults to global
+   * WordPress date_format option
+   * @return string
+   */
+  public function until(string $format = '') : string {
+    // TODO improve flexibility of this with filters
+    $format = $format
+      ?: get_option('date_format');
+
+    if (empty($this->until_datetime())) {
+      return '';
+    }
+
+    return $this->until_datetime()->format($format);
+  }
+
+  /**
    * Whether this Event recurs or not
    *
    * @return bool
@@ -170,5 +240,84 @@ class Event implements CoreInterface {
     return $this->post->meta(meta_key('recurrence_description'))
       ?: $this->fallbacks['recurrence_description']
       ?: ''; // ensure we have a string
+  }
+
+  /**
+   * Human-readable frequency
+   *
+   * @return string
+   */
+  public function frequency() : string {
+    $freq = $this->post->meta(meta_key('frequency')) ?: '';
+    return $freq ? ucfirst(strtolower($freq)) : '';
+  }
+
+
+
+  /* HELPER METHODS */
+
+
+  /**
+   * Get the start date/time string from $post and create a DateTimeImmutable
+   * object from it
+   *
+   * @internal
+   * @throws InvalidArgumentException if the stored string is unparseable
+   */
+  protected function start_datetime() : DateTimeImmutable {
+    if (!isset($this->start_datetime)) {
+      $str = $this->post->meta(meta_key('start'));
+      $dt  = date_create_immutable($str);
+      if (!$dt) {
+        // This won't happen unless you're doing something really weird,
+        // since we already queried this event by `start` which means we
+        // effectively parsed this date already.
+        throw new InvalidArgumentException('Invalid date string: ' . $str);
+      }
+      $this->start_datetime = $dt;
+    }
+
+    return $this->start_datetime;
+  }
+
+  /**
+   * Get the end date/time string from $post and create a DateTimeImmutable
+   * object from it
+   *
+   * @internal
+   * @throws InvalidArgumentException if the stored string is unparseable
+   */
+  protected function end_datetime() : DateTimeImmutable {
+    if (!isset($this->end_datetime)) {
+      $str = $this->post->meta(meta_key('end'));
+      $dt  = date_create_immutable($str);
+      if (!$dt) {
+        // This won't happen unless you're doing something really weird,
+        // since we already queried this event by `start` which means we
+        // effectively parsed this date already.
+        throw new InvalidArgumentException('Invalid date string: ' . $str);
+      }
+      $this->end_datetime = $dt;
+    }
+
+    return $this->end_datetime;
+  }
+
+  /**
+   * Get the until date/time string from $post and create a DateTimeImmutable
+   * object from it
+   *
+   * @internal
+   * @return DateTimeImmutable|false
+   */
+  protected function until_datetime() {
+    if (!isset($this->until_datetime)) {
+      $str                  = $this->post->meta(meta_key('until'));
+      $this->until_datetime = $str
+        ? date_create_immutable($str)
+        : false;
+    }
+
+    return $this->until_datetime;
   }
 }
