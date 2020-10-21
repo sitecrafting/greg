@@ -1,11 +1,11 @@
-<div class="greg-events-list">
+<div class="greg-events">
 
-  <h2 class="greg-event-category-title">{{ fn('__', 'Event Categories') }}</h2>
-  <ul class="greg-event-categories-list">
+  <h2 class="greg-events-list-title">{{ fn('__', 'Events') }}</h2>
+  <ul class="greg-events-list">
 
-    {% for post in posts %}
-      <li class="greg-event-category{{ term.id == cat.id ? ' greg-event-category--current' }}">
-        <a href="{{ cat.link() }}">{{ cat.title }}</a>
+    {% for event in events %}
+      <li class="greg-event">
+        <a href="{{ event.link() }}">{{ event.title }}</a>
       </li>
     {% endfor %}
 

@@ -1,0 +1,10 @@
+<div class="greg-event-details">
+
+  <h2 class="greg-event-title">{{ event.title }}</h2>
+  <h3 class="greg-event-recurrence">{{ event.recurrence_description | default(event.range) }}</h3>
+
+  <div class="greg-event-content">
+    {{ event.content }}
+  </div>
+
+</div>

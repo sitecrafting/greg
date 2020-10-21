@@ -244,6 +244,57 @@ As with the `Greg\render()` PHP function, you can pass extra data:
 </aside>
 ```
 
+### Available views
+
+Any of the following views can be rendered directly (e.g. passed to `greg_render()`):
+
+#### `events-list.twig`
+
+List all events.
+
+##### Params:
+
+* `params`: query params passed to `Greg\get_events()`. Default: `[]`
+* `events`: all events
+
+##### Example
+
+```twig
+{{ greg_render('events-list.twig', { params: { event_month: '2020-11' } }) }}
+```
+
+#### `event-categories-list.twig`
+
+List all Event Categories.
+
+##### Params
+
+* `term`: `Timber\Term` object for overriding the "current" term
+* `terms`: array of `Timber\Term` objects to override the listed categories
+
+##### Example
+
+```twig
+{{ greg_render('event-categories-list.twig', { term: { my_term } }) }}
+```
+
+#### `event-details.twig`
+
+Display Event Details.
+
+##### Params
+
+* `term`: `Timber\Term` object for overriding the "current" term
+* `terms`: array of `Timber\Term` objects to override the listed categories
+
+##### Example
+
+```twig
+{{ greg_render('event-categories-list.twig', { term: { my_term } }) }}
+```
+
+
+
 ### Overriding Greg's views
 
 A view can be overridden from your theme simply by placing it at a specific path relative to your theme route. For example, by placing a file at `./views/greg/event-categories.twig`, you tell Greg to render your theme's `event-categories` view instead of Greg's built-in one.

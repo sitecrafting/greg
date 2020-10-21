@@ -120,13 +120,22 @@ if (defined('WP_CLI') && WP_CLI) {
  * Merges in default data for the event-categories-list.twig view.
  */
 add_filter('greg/render/event-categories-list.twig', function(array $data) : array {
-  return array_merge($data, [
-    'term'         => Timber::get_term(),
-    'terms'        => Timber::get_terms([
-      'taxonomy'   => 'greg_event_category',
-      'hide_empty' => false,
-    ]),
+  $data['term']  = $data['term'] ?? Timber::get_term();
+  $data['terms'] = $data['terms'] ?? Timber::get_terms([
+    'taxonomy'   => 'greg_event_category',
   ]);
+
+  return $data;
+});
+
+/**
+ * Merges in default data for the event-categories-list.twig view.
+ */
+add_filter('greg/render/events-list.twig', function(array $data) : array {
+  $data['params'] = $data['params'] ?? [];
+  $data['events'] = $data['events'] ?? Greg\get_events($data['params']);
+
+  return $data;
 });
 
 add_filter('timber/locations', function(array $paths) {
