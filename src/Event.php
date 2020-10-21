@@ -78,7 +78,7 @@ class Event implements CoreInterface {
    *
    * @internal
    */
-  public static function from_array(array $event) {
+  public static function from_assoc(array $event) {
     return new self($event['post']);
   }
 

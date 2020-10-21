@@ -122,7 +122,7 @@ function get_events(array $params = []) {
     $events   = array_map([Event::class, 'post_to_calendar_series'], $events->to_array());
     $calendar = new Calendar($events);
 
-    return array_map([Event::class, 'from_array'], $calendar->recurrences());
+    return array_map([Event::class, 'from_assoc'], $calendar->recurrences());
   } else {
     return array_map([Event::class, 'from_post'], $events->to_array());
   }
