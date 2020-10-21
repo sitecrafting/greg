@@ -9,7 +9,10 @@
 
 namespace Greg;
 
-use \DateTimeImmutable;
+use DateTimeImmutable;
+use InvalidArgumentException;
+use LogicException;
+use Timber\PostCollection;
 use Timber\Timber;
 
 /**
@@ -28,14 +31,14 @@ class EventQuery {
   /**
    * The current time passed to the constructor, as a DateTimeImmutable object
    *
-   * @var DateTimeImmutable|false
+   * @var DateTimeImmutable
    */
   private $time;
 
   /**
    * The start_time inferred from $params, as a DateTimeImmutable object
    *
-   * @var DateTimeImmutable|false
+   * @var DateTimeImmutable
    */
   private $start_date;
 
@@ -57,12 +60,19 @@ class EventQuery {
    * Create a new EventQuery object with the given high-level params
    *
    * @param array $params params as passed to Greg\get_events()
+   * @throws \InvalidArgumentException if current_time, end_date, start_date,
+   * or event_month are invalid date strings
    */
   public function __construct(array $params) {
-    $this->params     = $params;
-    $this->time       = date_create_immutable($params['current_time']);
+    $current_time = date_create_immutable($params['current_time']);
+    if (!$current_time) {
+      throw new InvalidArgumentException('Invalid date string: ' . $params['current_time']);
+    }
+    $this->time = $current_time;
+
     $this->start_date = $this->init_start_date($params);
     $this->end_date   = $this->init_end_date($params, $this->start_date);
+    $this->params     = $params;
 
     $this->meta_keys = [
       'start_date' => $params['meta_keys']['start_date'] ?? 'start_date',
@@ -77,32 +87,49 @@ class EventQuery {
    * Get the initial value for $start_date
    *
    * @internal
+   * @throws \InvalidArgumentException on unparseable date string
    */
   protected function init_start_date(array $params) : DateTimeImmutable {
-    if (!empty($params['event_month'])) {
-      $start = date_create_immutable($params['event_month']);
-      if ($start) {
-        return $start;
-      }
+    $str = $params['event_month']
+      ?? $params['start_date']
+      ?? $params['current_time'];
+
+    $date = date_create_immutable($str);
+
+    if (!$date) {
+      throw new InvalidArgumentException('Invalid date string: ' . $str);
     }
 
-    return date_create_immutable($params['start_date'] ?? $params['current_time']);
+    return $date;
   }
 
   /**
    * Get the initial value for $end_date
    *
    * @internal
+   * @throws \InvalidArgumentException on unparseable date string
    */
   protected function init_end_date(array $params, DateTimeImmutable $start) : DateTimeImmutable {
     if (!empty($params['end_date'])) {
-      return date_create_immutable($params['end_date']);
+      $str = $params['end_date'];
     } else {
+      // calculate the first day of "next month" relative to $start
       $one_month_from_today = $start->modify('next month');
       $first_of_next_month  = date_create_immutable($one_month_from_today->format('Y-m-01'));
-      $end_of_this_month    = $first_of_next_month->modify('-1 day');
-      return date_create_immutable($end_of_this_month->format('Y-m-d 23:59:59'));
+      if (!$first_of_next_month) {
+        throw new InvalidArgumentException('Error computing end_date');
+      }
+      $end_of_this_month = $first_of_next_month->modify('-1 day');
+      $str               = $end_of_this_month->format('Y-m-d 23:59:59');
     }
+
+    $date = date_create_immutable($str);
+
+    if (!$date) {
+      throw new InvalidArgumentException('Invalid date string: ' . $str);
+    }
+
+    return $date;
   }
 
   /**
@@ -179,20 +206,16 @@ class EventQuery {
    * @internal
    */
   protected function start_date() : string {
-    if (!empty($this->params['start_date']) && $this->start_date) {
+    if (!empty($this->params['start_date'])) {
       // User passed explicit start_date; honor precisely.
       return $this->start_date->format('Y-m-d 00:00:00');
     }
 
-    if ($this->time && $this->truncate() && $this->within_current_month($this->start_date)) {
+    if ($this->truncate() && $this->within_current_month($this->start_date)) {
       return $this->time->format('Y-m-d 00:00:00');
     }
 
-    if ($this->start_date) {
-      return $this->start_date->format('Y-m-01 00:00:00');
-    }
-
-    return '';
+    return $this->start_date->format('Y-m-01 00:00:00');
   }
 
   /**

@@ -9,6 +9,7 @@
 
 namespace Greg\Unit;
 
+use InvalidArgumentException;
 use Greg\EventQuery;
 
 /**
@@ -114,34 +115,43 @@ class EventQueryTest extends BaseTest {
     ], $query->params()['meta_query'][1]);
   }
 
+  public function test_params_garbage_current_time() {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('Invalid date string: GARBAGE');
+
+    $query = new EventQuery([
+      'current_time' => 'GARBAGE',
+    ]);
+  }
+
   public function test_params_garbage_event_month() {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('Invalid date string: GARBAGE');
+
     $query = new EventQuery([
       'current_time' => '2020-10-15 16:20:00',
-      'event_month'  => 'GARBAGE', // this will fail over to current_time
+      'event_month'  => 'GARBAGE',
     ]);
+  }
 
-    $this->assertEquals([
-      'key'     => 'start_date',
-      'value'   => '2020-10-01 00:00:00',
-      'compare' => '>=',
-      'type'    => 'DATETIME',
-    ], $query->params()['meta_query'][0]);
-    $this->assertEquals([
-      'relation' => 'OR',
-      // Include events up to the end of the current month
-      [
-        'key'     => 'end_date',
-        'value'   => '2020-10-31 23:59:59',
-        'compare' => '<=',
-        'type'    => 'DATETIME',
-      ],
-      [
-        'key'     => 'until',
-        'value'   => '2020-10-31 23:59:59',
-        'compare' => '<=',
-        'type'    => 'DATETIME',
-      ],
-    ], $query->params()['meta_query'][1]);
+  public function test_params_garbage_start_date() {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('Invalid date string: GARBAGE');
+
+    $query = new EventQuery([
+      'current_time' => '2020-10-15 16:20:00',
+      'start_date'   => 'GARBAGE',
+    ]);
+  }
+
+  public function test_params_garbage_end_date() {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('Invalid date string: GARBAGE');
+
+    $query = new EventQuery([
+      'current_time' => '2020-10-15 16:20:00',
+      'end_date'     => 'GARBAGE',
+    ]);
   }
 
   public function test_params_start_date() {

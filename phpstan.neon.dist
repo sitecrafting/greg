@@ -1,7 +1,7 @@
 includes:
   - vendor/szepeviktor/phpstan-wordpress/extension.neon
 parameters:
-  level: 5
+  level: max
   inferPrivatePropertyTypeFromConstructor: true
   checkMissingIterableValueType: false
   bootstrapFiles:
@@ -11,3 +11,5 @@ parameters:
   ignoreErrors:
     # TODO Figure out how to discover the WP_CLI class
     - '#^Call to static method success\(\) on an unknown class WP_CLI\.$#'
+    # We can't have strong typehints without union types :(
+    - '#has no return typehint specified\.#'
