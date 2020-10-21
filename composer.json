@@ -37,6 +37,11 @@
     },
     "files": ["src/api.php"]
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Greg\\Integration\\": "test/integration/"
+    }
+  },
   "scripts": {
     "unit": [
       "./vendor/bin/phpunit --group unit"
