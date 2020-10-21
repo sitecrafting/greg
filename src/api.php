@@ -93,11 +93,12 @@ function render(string $view, array $data = []) : void {
  * ]);
  * ```
  * @param array $params event query params
- * @return \Timber\PostCollection|false
+ * @return array|false
  */
 function get_events(array $params = []) {
   $params = array_merge([
     'current_time' => gmdate('Y-m-d H:i:s'),
+    // TODO meta_keys here
   ], $params);
 
   try {
@@ -109,6 +110,45 @@ function get_events(array $params = []) {
     return false;
   }
 
-  // TODO db error handling
-  return $query->get_results();
+  $events = $query->get_results();
+
+  if (!$events) {
+    return false;
+  }
+
+  // Unless recurrence expansion is explicitly disabled, expand each
+  // (potentially) recurring event into its comprising recurrences.
+  if ($params['expand_recurrences'] ?? true) {
+    // TODO abstract this out into a class
+    $events = array_map(function($event) : array {
+      $recurrence_rules = [];
+      $until            = $event->meta('until');
+      $frequency        = $event->meta('frequency');
+
+      if ($until && $frequency) {
+        $recurrence_rules = [
+          'until'      => $until,
+          'frequency'  => $frequency,
+          'exceptions' => $event->meta('exceptions') ?: [],
+        ];
+      }
+
+      return [
+        // TODO use meta_keys filter
+        'start'                  => $event->meta('start_date'),
+        'end'                    => $event->meta('end_date'),
+        'title'                  => $event->title(),
+        'recurrence'             => $recurrence_rules,
+        'recurrence_description' => $event->meta('recurrence_description'),
+        'post'                   => $event,
+      ];
+    }, $events->to_array());
+
+    $calendar = new Calendar($events);
+
+    return $calendar->recurrences();
+  } else {
+    // TODO map to Event objects
+    return $events->to_array();
+  }
 }

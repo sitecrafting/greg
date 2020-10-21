@@ -70,10 +70,11 @@ If you want to, you can also tell Greg to give you just the three Events, in cas
 ```php
 add_filter('greg/meta_keys', function() : array {
   return [
-    'start'     => 'my_start_date_key',
-    'end'       => 'my_end_date_key',
-    'frequency' => 'my_frequency_key',
-    'until'     => 'my_until_key',
+    'start'      => 'my_start_date_key',
+    'end'        => 'my_end_date_key',
+    'frequency'  => 'my_frequency_key',
+    'until'      => 'my_until_key',
+    'exceptions' => 'my_exceptions_key',
   ];
 });
 ```
