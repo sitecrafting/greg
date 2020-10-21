@@ -41,6 +41,7 @@ class EventTest extends IntegrationTest {
     $this->assertFalse($event->recurring());
     $this->assertEquals('November 1, 2020 1:30 pm', $event->start());
     $this->assertEquals('3:00 pm', $event->end());
+    $this->assertEquals('November 1, 2020 1:30 pm - 3:00 pm', $event->range());
     $this->assertEquals('', $event->until());
     $this->assertEmpty($event->frequency());
     $this->assertEmpty($event->recurrence_description());
@@ -68,6 +69,7 @@ class EventTest extends IntegrationTest {
 
     $this->assertEquals('Sunday, November 1st at 1:30pm', $event->start('l, F jS \a\t g:ia'));
     $this->assertEquals('3:00pm', $event->end('g:ia'));
+    $this->assertEquals('11/1 1:30pm thru 3:00pm', $event->range('m/j g:ia', 'g:ia', ' thru '));
   }
 
   public function test_event_recurring() {

@@ -176,6 +176,22 @@ class Event implements CoreInterface {
 
 
   /**
+   * Start/End date/time range
+   *
+   * @param string $start_format the format for displaying start date/time
+   * @param string $end_format the format for displaying end date/time
+   * @param string $separator the string to place between start and end
+   * @return string
+   */
+  public function range(
+    string $start_format = '',
+    string $end_format = '',
+    string $separator = ' - '
+  ) : string {
+    return $this->start($start_format) . $separator . $this->end($end_format);
+  }
+
+  /**
    * Start date/time, optionally formatted
    *
    * @param string $format optional date string format string, defaults to global
