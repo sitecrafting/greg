@@ -244,7 +244,8 @@ class Event implements CoreInterface {
    * @return bool
    */
   public function recurring() : bool {
-    return $this->post->meta('until') && $this->post->meta('frequency');
+    return $this->post->meta(meta_key('until'))
+      && $this->post->meta(meta_key('frequency'));
   }
 
   /**

@@ -175,6 +175,7 @@ class EventTest extends IntegrationTest {
 
     // Calling corresponding methods should be exactly the same as if we had
     // used all the default meta_keys.
+    $this->assertTrue($event->recurring());
     $this->assertEquals('My Recurring Event', $event->title());
     $this->assertEquals('November 1, 2020 1:30 pm', $event->start());
     $this->assertEquals('3:00 pm', $event->end());
