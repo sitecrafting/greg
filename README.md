@@ -144,7 +144,9 @@ $events = Timber::get_posts([
 ]);
 ```
 
-Passing a string for `greg_event_category` indicates it's a term slug; int means it's a `term_id`. You can also pass an array of strings or ints to query for events by any (inclusive) corresponding slugs/`term_id`s, respectively.
+This returns an array of `Greg\Event` objects. These are wrappers around `Timber\Post` objects that acts like a Post object but has some extra data/methods for things like date ranges. Each `Event` represents a single recurrence of an event, so a Post can expand to one or more Events.
+
+Passing a string for `event_category` indicates it's a term slug; int means it's a `term_id`. You can also pass an array of strings or ints to query for events by any (inclusive) corresponding slugs/`term_id`s, respectively.
 
 Instead of `month`, you can also specify a date range via separate `start` and `end` params:
 
