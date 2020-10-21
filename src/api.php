@@ -146,9 +146,8 @@ function get_events(array $params = []) {
 
     $calendar = new Calendar($events);
 
-    return $calendar->recurrences();
+    return array_map([Event::class, 'from_array'], $calendar->recurrences());
   } else {
-    // TODO map to Event objects
-    return $events->to_array();
+    return array_map([Event::class, 'from_post'], $events->to_array());
   }
 }

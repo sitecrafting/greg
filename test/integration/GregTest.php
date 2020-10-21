@@ -11,6 +11,7 @@ namespace Greg\Integration;
 
 use InvalidArgumentException;
 use Greg;
+use Greg\Event;
 
 /**
  * Test case for the core query logic within the public Greg API.
@@ -63,9 +64,8 @@ class GregTest extends IntegrationTest {
     $events = Greg\get_events();
 
     $this->assertCount(1, $events);
-    // TODO
-    // $this->assertEquals('My Single Event', $events[0]->title());
-    $this->assertEquals('My Single Event', $events[0]['title']);
+    $this->assertInstanceOf(Event::class, $events[0]);
+    $this->assertEquals('My Single Event', $events[0]->title());
   }
 
   public function test_get_events_with_recurrences() {
@@ -87,7 +87,10 @@ class GregTest extends IntegrationTest {
     $events = Greg\get_events();
 
     $this->assertCount(8, $events);
-    $this->assertEquals('My Single Event', $events[0]['title']); // TODO call $event->title() instead
+    foreach ($events as $event) {
+      $this->assertInstanceOf(Event::class, $event);
+      $this->assertEquals('My Single Event', $event->title());
+    }
   }
 
   public function test_get_events_skip_expansion() {
@@ -111,6 +114,7 @@ class GregTest extends IntegrationTest {
     ]);
 
     $this->assertCount(1, $events);
+    $this->assertInstanceOf(Event::class, $events[0]);
     $this->assertEquals('My Single Event', $events[0]->title());
   }
 }
