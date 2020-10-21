@@ -94,10 +94,13 @@ tooling:
     cmd: './vendor/bin/phpstan'
     description: 'Run phpstan commands for static analysis'
 
-  gitbook:
-    service: gitbook
-    cmd: 'yarn gitbook'
-    description: 'Run arbitrary gitbook commands'
+  ci:
+    service: appserver
+    cmd:
+      - './vendor/bin/phpunit'
+      - './vendor/bin/phpstan analyse'
+      - './vendor/bin/phpcs --standard=./phpcs.xml test/unit test/integration src'
+    description: 'Run all continuous integration (CI) checks'
 
 proxy:
   appserver:
