@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Greg\Integration\EventQueryTest class
+ * Greg\Integration\GregTest class
  *
  * @copyright 2020 SiteCrafting, Inc.
  * @author    Coby Tamayo <ctamayo@sitecrafting.com>
