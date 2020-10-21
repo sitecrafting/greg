@@ -119,31 +119,7 @@ function get_events(array $params = []) {
   // Unless recurrence expansion is explicitly disabled, expand each
   // (potentially) recurring event into its comprising recurrences.
   if ($params['expand_recurrences'] ?? true) {
-    // TODO abstract this out into a class
-    $events = array_map(function($event) : array {
-      $recurrence_rules = [];
-      $until            = $event->meta('until');
-      $frequency        = $event->meta('frequency');
-
-      if ($until && $frequency) {
-        $recurrence_rules = [
-          'until'      => $until,
-          'frequency'  => $frequency,
-          'exceptions' => $event->meta('exceptions') ?: [],
-        ];
-      }
-
-      return [
-        // TODO use meta_keys filter
-        'start'                  => $event->meta('start_date'),
-        'end'                    => $event->meta('end_date'),
-        'title'                  => $event->title(),
-        'recurrence'             => $recurrence_rules,
-        'recurrence_description' => $event->meta('recurrence_description'),
-        'post'                   => $event,
-      ];
-    }, $events->to_array());
-
+    $events   = array_map([Event::class, 'post_to_calendar_series'], $events->to_array());
     $calendar = new Calendar($events);
 
     return array_map([Event::class, 'from_array'], $calendar->recurrences());

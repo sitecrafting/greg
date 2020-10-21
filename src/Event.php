@@ -33,6 +33,37 @@ class Event implements CoreInterface {
   }
 
   /**
+   * Convert a Post into an array that Calendar::__construct will accept
+   *
+   * @internal
+   * @param Post $event the greg_event post to convert
+   * @return array
+   */
+  public static function post_to_calendar_series(Post $event) : array {
+    // TODO use meta_keys filter
+    $recurrence_rules = [];
+    $until            = $event->meta('until');
+    $frequency        = $event->meta('frequency');
+
+    if ($until && $frequency) {
+      $recurrence_rules = [
+        'until'      => $until,
+        'frequency'  => $frequency,
+        'exceptions' => $event->meta('exceptions') ?: [],
+      ];
+    }
+
+    return [
+      'start'                  => $event->meta('start_date'),
+      'end'                    => $event->meta('end_date'),
+      'title'                  => $event->title(),
+      'recurrence'             => $recurrence_rules,
+      'recurrence_description' => $event->meta('recurrence_description'),
+      'post'                   => $event,
+    ];
+  }
+
+  /**
    * Create a new Event wrapper object from a Post
    *
    * @internal
