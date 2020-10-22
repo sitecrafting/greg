@@ -24,7 +24,7 @@ A de-coupled calendar solution for WordPress and Timber. Leverage [RRULE](https:
 
 Let's get one thing out of the way: Greg is **not** a drop-in replacement for The Events Calendar. Greg is designed to be much more flexible code-wise, with the trade-off of being a little less "plug-n-play" from an end-user's perspective. Some key differences:
 
-* Rather than the plugin rendering its own WP Admin metaboxes, you build your own backend fields (using ACF or something similar) and tell Greg where to find that data.
+* Rather than the plugin rendering its own WP Admin user interface (UI), you build your own backend fields (using ACF or something similar) and tell Greg where to find that data (see [Basic Usage](#basic-usage) for details).
 * The Events Calendar is completely standalone (Note: The Events Calendar PRO is a paid add-on to The Events Calendar), whereas Greg relies on [Timber](https://timber.github.io/docs/) and, by extension, [Twig](https://twig.symfony.com/).
 * The Events Calendar (and most other WP event management plugins out there) store one post **per event recurrence**. This causes all kinds of problems, including slow database queries, confusing and burdensome data management issues, and **tons** of incidental complexity. Greg cuts away all of that.
 
