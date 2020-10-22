@@ -72,6 +72,7 @@ function main() {
 
   # archive plugins distro files inside a top-level greg/ dir
   tar -cvzf "$tar_name" \
+    greg/api.php \
     greg/greg.php \
     greg/lib \
     greg/vendor \
@@ -81,6 +82,7 @@ function main() {
 
   # ditto for zip
   zip -r "${zip_name}" \
+    greg/api.php \
     greg/greg.php \
     greg/lib \
     greg/vendor \
