@@ -8,6 +8,38 @@
 
 A de-coupled calendar solution for WordPress and Timber. Leverage [RRULE](https://github.com/rlanvin/php-rrule) to store only the recurrence rules for your recurring events. Supports one-time and recurring events.
 
+## Contents
+
+* [Rationale](#rationale)
+* [Installation](#installation)
+* [Requirements](#requirements)
+* [Basic Usage](#basic-usage)
+* [Actions & Filters](#actions--filters)
+* [Command Line Interface](#command-line-interface-cli)
+* [Development](#development)
+* [Testing](#testing)
+* [Roadmap](#roadmap)
+
+## Rationale
+
+Let's get one thing out of the way: Greg is **not** a drop-in replacement for The Events Calendar. Greg is designed to be much more flexible code-wise, with the trade-off of being a little less "plug-n-play" from an end-user's perspective. Some key differences:
+
+* Rather than the plugin rendering its own WP Admin metaboxes, you build your own backend fields (using ACF or something similar) and tell Greg where to find that data.
+* The Events Calendar is completely standalone (Note: The Events Calendar PRO is a paid add-on to The Events Calendar), whereas Greg relies on [Timber](https://timber.github.io/docs/) and, by extension, [Twig](https://twig.symfony.com/).
+* The Events Calendar (and most other WP event management plugins out there) store one post **per event recurrence**. This causes all kinds of problems, including slow database queries, confusing and burdensome data management issues, and **tons** of incidental complexity. Greg cuts away all of that.
+
+### Use Greg if:
+
+* You want to manage recurring events in a simple, reasonably performant way
+* You are OK building out your own backend UI for Events using ACF or similar (a default backend UI is on the [Roadmap](#roadmap) but is not implemented yet)
+* You are already running Timber/Twig and want to integrate your frontend Event code with that
+
+### Do NOT use Greg if:
+
+* You want a plug-n-play event management system that renders your event calendar/listing/detail pages for you
+* You want a WP Admin page with tons of settings you can control without code updates
+* You want a standalone solution (not reliant on Timber)
+
 ## Installation
 
 ### Manual Installation
@@ -392,12 +424,9 @@ lando integration # run integration tests
 lando test # run all tests
 ```
 
-## TODO
+## Roadmap
 
-- Performance optimization (see **Performance**, above)
-- REST endpoints
-- Default meta field keys (make the `greg/meta_keys` hook optional)
+- Performance optimizations (see [**Performance**](#performance), above)
+- REST endpoints for listing/singular events
 - Default (but still optional) admin GUI using the configured meta keys
-- Default frontend code
 - Shortcodes for listing Events, listing Event Categories, Event Details, etc.
-- Actually implement it, lol
