@@ -150,7 +150,7 @@ class EventQuery {
   public function params() : array {
     return array_merge([
       'post_type'  => 'greg_event',
-    ], $this->meta());
+    ], $this->meta_clause(), $this->tax_clause());
   }
 
   /**
@@ -158,7 +158,37 @@ class EventQuery {
    *
    * @internal
    */
-  protected function meta() : array {
+  protected function tax_clause() : array {
+    if (empty($this->params['event_category'])) {
+      return [];
+    }
+
+    // Ensure we have an array
+    $cat_filter = $this->params['event_category'];
+    $cat_filter = is_array($cat_filter) ? $cat_filter : [$cat_filter];
+
+    // Determine whether we're dealing with term_ids or slugs
+    $term_id_count = count(array_filter(array_map('is_int', $cat_filter)));
+    $all_ids       = count($cat_filter) === $term_id_count;
+    $field         = $all_ids ? 'term_id' : 'slug';
+
+    return [
+      'tax_query'    => [
+        [
+          'taxonomy' => 'greg_event_category',
+          'terms'    => $cat_filter,
+          'field'    => $field,
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Get the meta_query array to merge into main params, if any
+   *
+   * @internal
+   */
+  protected function meta_clause() : array {
     if (empty($this->start_date()) && empty($this->end_date())) {
       return [];
     }

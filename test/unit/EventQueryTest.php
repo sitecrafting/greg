@@ -214,4 +214,79 @@ class EventQueryTest extends BaseTest {
       ],
     ], $query->params()['meta_query'][1]);
   }
+
+  public function test_params_event_category_slug() {
+    $query = new EventQuery([
+      'current_time'   => '2020-10-15 16:20:00',
+      'event_category' => 'dogs',
+    ]);
+
+    $this->assertEquals([
+      [
+        'taxonomy' => 'greg_event_category',
+        'terms'    => ['dogs'],
+        'field'    => 'slug',
+      ],
+    ], $query->params()['tax_query']);
+  }
+
+  public function test_params_event_category_id() {
+    $query = new EventQuery([
+      'current_time'   => '2020-10-15 16:20:00',
+      'event_category' => 123,
+    ]);
+
+    $this->assertEquals([
+      [
+        'taxonomy' => 'greg_event_category',
+        'terms'    => [123],
+        'field'    => 'term_id',
+      ],
+    ], $query->params()['tax_query']);
+  }
+
+  public function test_params_event_category_slug_array() {
+    $query = new EventQuery([
+      'current_time'   => '2020-10-15 16:20:00',
+      'event_category' => ['dogs', 'snakes'],
+    ]);
+
+    $this->assertEquals([
+      [
+        'taxonomy' => 'greg_event_category',
+        'terms'    => ['dogs', 'snakes'],
+        'field'    => 'slug',
+      ],
+    ], $query->params()['tax_query']);
+  }
+
+  public function test_params_event_category_id_array() {
+    $query = new EventQuery([
+      'current_time'   => '2020-10-15 16:20:00',
+      'event_category' => [123, 345],
+    ]);
+
+    $this->assertEquals([
+      [
+        'taxonomy' => 'greg_event_category',
+        'terms'    => [123, 345],
+        'field'    => 'term_id',
+      ],
+    ], $query->params()['tax_query']);
+  }
+
+  public function test_params_event_category_mixed_array() {
+    $query = new EventQuery([
+      'current_time'   => '2020-10-15 16:20:00',
+      'event_category' => ['dogs', 123],
+    ]);
+
+    $this->assertEquals([
+      [
+        'taxonomy' => 'greg_event_category',
+        'terms'    => ['dogs', '123'],
+        'field'    => 'slug',
+      ],
+    ], $query->params()['tax_query']);
+  }
 }
