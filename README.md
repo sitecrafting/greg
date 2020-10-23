@@ -222,14 +222,6 @@ If you specify any custom `meta_query` or `tax_query` params, Greg will merge th
 
 Greg is currently not as optimized as it could be. Specifically, to fetch the actual meta data it currently does a few database lookups for each recurring event in a result set. This is pretty typical of WordPress code, where you don't usually fetch meta data until after you've already queried for your post(s). But a faster way would be to map between a post ID and a recurrence ruleset in a *single* query result, so that for a collection of events of any size, we only need one round trip to the database. This would require some advanced logic to compile custom SQL clauses at query time, and may become available in a future version.
 
-For now, we recommend using Greg's query cache, which is enabled by default.
-
-You can disable Greg's query cache with the `greg/query/enable_cache` filter:
-
-```php
-add_filter('greg/query/enable_cache', '__return_false');
-```
-
 ### Templates & Views
 
 Greg takes full advantage of Timber's use of the [Twig template engine](https://twig.symfony.com/). While Greg's frontend code is completely optional, the basic views provided are useful out of the box and are completely customizable.
