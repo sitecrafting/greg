@@ -7,6 +7,7 @@
     <config name="installed_paths" value="vendor/wp-coding-standards/wpcs" />
 
     <!-- What files to check. -->
+    <file>./greg.php</file>
     <file>./src/</file>
     <file>./test/unit/</file>
     <file>./test/integration/</file>
