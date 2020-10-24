@@ -25,6 +25,7 @@ cache:
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
   - mysql -e 'GRANT ALL PRIVILEGES ON test.* TO test@localhost IDENTIFIED BY "test";'
+  - composer self-update --1
 
 install:
   - composer install --no-interaction --prefer-dist
