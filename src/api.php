@@ -119,8 +119,7 @@ function get_events(array $params = []) {
   // Unless recurrence expansion is explicitly disabled, expand each
   // (potentially) recurring event into its comprising recurrences.
   if ($params['expand_recurrences'] ?? true) {
-    $events   = array_map([Event::class, 'post_to_calendar_series'], $events->to_array());
-    $calendar = new Calendar($events);
+    $calendar = new Calendar(array_map([Event::class, 'post_to_calendar_series'], $events->to_array()));
 
     return array_map([Event::class, 'from_assoc'], $calendar->recurrences());
   }
