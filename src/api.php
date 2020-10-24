@@ -112,7 +112,7 @@ function get_events(array $params = []) {
 
   $events = $query->get_results();
 
-  if (!$events) {
+  if (!is_array($events)) {
     return false;
   }
 
@@ -123,9 +123,8 @@ function get_events(array $params = []) {
     $calendar = new Calendar($events);
 
     return array_map([Event::class, 'from_assoc'], $calendar->recurrences());
-  } else {
-    return array_map([Event::class, 'from_post'], $events->to_array());
   }
+  return array_map([Event::class, 'from_post'], $events->to_array());
 }
 
 /**

@@ -33,7 +33,7 @@ define('GREG_PLUGIN_JS_ROOT', GREG_PLUGIN_WEB_PATH . 'js');
 define('GREG_PLUGIN_VIEW_PATH', __DIR__ . '/views');
 
 
-add_action('init', function() {
+add_action('init', function() : void {
   register_post_type('greg_event', [
     'public'                  => true,
     'description'             => 'Calendar Events, potentially with recurrences',
@@ -102,7 +102,7 @@ add_filter('greg/meta_keys', function() : array {
 /*
  * Add REST Routes
  */
-add_action('rest_api_init', function() {
+add_action('rest_api_init', function() : void {
   $controller = new RestController();
   $controller->register_routes();
 });
@@ -112,8 +112,7 @@ add_action('rest_api_init', function() {
  * Add WP-CLI tooling
  */
 if (defined('WP_CLI') && WP_CLI) {
-  $command = new GregCommand();
-  WP_CLI::add_command('greg', $command);
+  WP_CLI::add_command('greg', GregCommand::class);
 }
 
 /**
@@ -138,7 +137,7 @@ add_filter('greg/render/events-list.twig', function(array $data) : array {
   return $data;
 });
 
-add_filter('timber/locations', function(array $paths) {
+add_filter('timber/locations', function(array $paths) : array {
   $paths['greg'] = [
     get_template_directory() . '/views/greg',
     GREG_PLUGIN_VIEW_PATH . '/twig',
@@ -147,10 +146,10 @@ add_filter('timber/locations', function(array $paths) {
   return $paths;
 });
 
-add_filter('timber/twig', function(Environment $twig) {
-  $twig->addFunction(new TwigFunction('greg_compile', Greg\compile::class));
-  $twig->addFunction(new TwigFunction('greg_render', Greg\render::class));
-  $twig->addFunction(new TwigFunction('greg_get_events', Greg\get_events::class));
+add_filter('timber/twig', function(Environment $twig) : Environment {
+  $twig->addFunction(new TwigFunction('greg_compile', '\\Greg\\compile'));
+  $twig->addFunction(new TwigFunction('greg_render', '\\Greg\\render'));
+  $twig->addFunction(new TwigFunction('greg_get_events', '\\Greg\\get_events'));
 
   return $twig;
 });
