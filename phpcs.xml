@@ -4,20 +4,16 @@
 
     <arg name="tab-width" value="2" />
 
-		<config name="installed_paths" value="vendor/wp-coding-standards/wpcs" />
+    <config name="installed_paths" value="vendor/wp-coding-standards/wpcs" />
 
-    <!--
-        Default settings for command line usage
-    -->
-
-    <!-- Exclude folders and files from being checked. -->
+    <!-- What files to check. -->
+    <file>./greg.php</file>
+    <file>./src/</file>
+    <file>./test/unit/</file>
+    <file>./test/integration/</file>
     <exclude-pattern>wp-content/</exclude-pattern>
     <exclude-pattern>wp/</exclude-pattern>
-    <exclude-pattern>vendor/*</exclude-pattern>
-    <exclude-pattern>test/themes</exclude-pattern>
-
-    <!-- If no files or directories are specified on the command line, check all relevant files. -->
-    <file>./lib</file>
+    <exclude-pattern>vendor/</exclude-pattern>
 
     <!-- Use colors in output. -->
     <arg name="colors"/>
