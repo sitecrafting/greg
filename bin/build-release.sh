@@ -74,7 +74,7 @@ function main() {
   tar -cvzf "$tar_name" \
     greg/src/api.php \
     greg/greg.php \
-    greg/lib \
+    greg/src \
     greg/vendor \
     greg/views \
     greg/LICENSE.txt \
@@ -84,7 +84,7 @@ function main() {
   zip -r "${zip_name}" \
     greg/src/api.php \
     greg/greg.php \
-    greg/lib \
+    greg/src \
     greg/vendor \
     greg/views \
     greg/LICENSE.txt \
