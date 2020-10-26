@@ -116,6 +116,7 @@ class Event implements CoreInterface {
    * Create a new Event wrapper object from a Post
    *
    * @internal
+   * @return self
    */
   public static function from_post(Post $post) {
     return new self($post);
@@ -126,6 +127,7 @@ class Event implements CoreInterface {
    * of a recurring event, which MUST include a `post` index.
    *
    * @internal
+   * @return self
    */
   public static function from_assoc(array $event) {
     $fallbacks = array_intersect_key($event, array_flip([
@@ -140,6 +142,7 @@ class Event implements CoreInterface {
    * @internal
    * @param string $method the method name
    * @param array $args the method args
+   * @return mixed
    */
   public function __call($method, $args) {
     $func = [$this->post, $method];
@@ -154,6 +157,7 @@ class Event implements CoreInterface {
    *
    * @internal
    * @param string $field the field name
+   * @return mixed
    */
   public function __get($field) {
     return $this->post->$field;

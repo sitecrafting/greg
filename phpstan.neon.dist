@@ -5,11 +5,14 @@ parameters:
   inferPrivatePropertyTypeFromConstructor: true
   checkMissingIterableValueType: false
   bootstrapFiles:
-    - phpstan/bootstrap.php
+    - tests/phpstan/bootstrap.php
+  scanFiles:
+    - vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
   paths:
-    - src
+    - greg.php
+    - src/
+    #- tests/unit/
+    #- tests/integration/
   ignoreErrors:
-    # TODO Figure out how to discover the WP_CLI class
-    - '#^Call to static method success\(\) on an unknown class WP_CLI\.$#'
-    # We can't have strong typehints without union types :(
-    - '#has no return typehint specified\.#'
+    # WP-CLI accepts a class as callable
+    - '/^Parameter #2 \$callable of static method WP_CLI::add_command\(\) expects callable\(\): mixed, \S+ given\.$/'
