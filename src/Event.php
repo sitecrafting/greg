@@ -41,11 +41,11 @@ class Event implements CoreInterface {
   protected $post;
 
   /**
-   * Fallbacks for specific fields
+   * Options for specific fields
    *
    * @var array
    */
-  protected $fallbacks;
+  protected $options;
 
   /**
    * Internal start datetime
@@ -72,13 +72,33 @@ class Event implements CoreInterface {
    * Create a new Event wrapper object to wrap an event Post
    *
    * @param \Timber\Post $post the greg_event Post object to wrap
-   * @param array $fallbacks optional fallbacks for specific fields. The
+   * @param array $options optional options for specific fields. The
    * following fields are supported:
+   * * start - for recurrences, which have their own independent start dates
+   * * end - for recurrences, which also have their own independent end dates
    * * recurrence_description
+   * @throws InvalidArgumentException if start or end is not a parseable
+   * date string.
    */
-  public function __construct(Post $post, array $fallbacks = []) {
-    $this->post      = $post;
-    $this->fallbacks = $fallbacks;
+  public function __construct(Post $post, array $options = []) {
+    $this->post    = $post;
+    $this->options = $options;
+
+    if (!empty($options['start'])) {
+      $start = date_create_immutable($options['start']);
+      if (!$start) {
+        throw new InvalidArgumentException('Invalid date string: ' . $options['start']);
+      }
+      $this->start_datetime = $start;
+    }
+
+    if (!empty($options['end'])) {
+      $end = date_create_immutable($options['end']);
+      if (!$end) {
+        throw new InvalidArgumentException('Invalid date string: ' . $options['end']);
+      }
+      $this->end_datetime = $end;
+    }
   }
 
   /**
@@ -113,7 +133,9 @@ class Event implements CoreInterface {
   }
 
   /**
-   * Create a new Event wrapper object from a Post
+   * Create a new Event wrapper object from a Post. Intended for singular,
+   * non-recurring Events. For recurring Events, always ensure you pass
+   * start/end options specific to each recurrence.
    *
    * @internal
    */
@@ -124,14 +146,17 @@ class Event implements CoreInterface {
   /**
    * Create a new Event wrapper object from an internal array representation
    * of a recurring event, which MUST include a `post` index.
+   * Always ensure you pass start/end options specific to each recurrence.
    *
    * @internal
    */
   public static function from_assoc(array $event) {
-    $fallbacks = array_intersect_key($event, array_flip([
+    $options = array_intersect_key($event, array_flip([
       'recurrence_description',
+      'start',
+      'end',
     ]));
-    return new self($event['post'], $fallbacks);
+    return new self($event['post'], $options);
   }
 
   /**
@@ -255,7 +280,7 @@ class Event implements CoreInterface {
    */
   public function recurrence_description() : string {
     return $this->post->meta(meta_key('recurrence_description'))
-      ?: $this->fallbacks['recurrence_description']
+      ?: $this->options['recurrence_description']
       ?: ''; // ensure we have a string
   }
 

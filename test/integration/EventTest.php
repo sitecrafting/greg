@@ -107,6 +107,99 @@ class EventTest extends IntegrationTest {
     );
   }
 
+  public function test_event_start_recurring() {
+    $current_time = '2020-10-31 22:00:00';
+
+    $start = '2020-11-01 13:30:00';
+    $end   = '2020-11-01 15:00:00';
+    $until = '2020-11-05 13:30:00';
+
+    $this->factory->post->create([
+      'post_type'                => 'greg_event',
+      'post_title'               => 'My Recurring Event',
+      'meta_input'               => [
+        'start'                  => $start,
+        'end'                    => $end,
+        'frequency'              => 'DAILY',
+        'until'                  => $until,
+      ],
+    ]);
+
+    // Mock the current time; we want to compare resulting date strings exactly.
+    $events = Greg\get_events([
+      'current_time' => $current_time,
+    ]);
+
+    // 2020-11-01 - 2020-11-05
+    $this->assertEquals('November 1, 2020 1:30 pm', $events[0]->start());
+    $this->assertEquals('November 2, 2020 1:30 pm', $events[1]->start());
+    $this->assertEquals('November 3, 2020 1:30 pm', $events[2]->start());
+    $this->assertEquals('November 4, 2020 1:30 pm', $events[3]->start());
+    $this->assertEquals('November 5, 2020 1:30 pm', $events[4]->start());
+  }
+
+  public function test_event_end_recurring() {
+    $current_time = '2020-10-31 22:00:00';
+
+    $start = '2020-11-01 13:30:00';
+    $end   = '2020-11-01 15:00:00';
+    $until = '2020-11-05 13:30:00';
+
+    $this->factory->post->create([
+      'post_type'                => 'greg_event',
+      'post_title'               => 'My Recurring Event',
+      'meta_input'               => [
+        'start'                  => $start,
+        'end'                    => $end,
+        'frequency'              => 'DAILY',
+        'until'                  => $until,
+      ],
+    ]);
+
+    // Mock the current time; we want to compare resulting date strings exactly.
+    $events = Greg\get_events([
+      'current_time' => $current_time,
+    ]);
+
+    // 2020-11-01 - 2020-11-05
+    $this->assertEquals('11/1 3:00 pm', $events[0]->end('m/j g:i a'));
+    $this->assertEquals('11/2 3:00 pm', $events[1]->end('m/j g:i a'));
+    $this->assertEquals('11/3 3:00 pm', $events[2]->end('m/j g:i a'));
+    $this->assertEquals('11/4 3:00 pm', $events[3]->end('m/j g:i a'));
+    $this->assertEquals('11/5 3:00 pm', $events[4]->end('m/j g:i a'));
+  }
+
+  public function test_event_range_recurring() {
+    $current_time = '2020-10-31 22:00:00';
+
+    $start = '2020-11-01 13:30:00';
+    $end   = '2020-11-01 15:00:00';
+    $until = '2020-11-05 13:30:00';
+
+    $this->factory->post->create([
+      'post_type'                => 'greg_event',
+      'post_title'               => 'My Recurring Event',
+      'meta_input'               => [
+        'start'                  => $start,
+        'end'                    => $end,
+        'frequency'              => 'DAILY',
+        'until'                  => $until,
+      ],
+    ]);
+
+    // Mock the current time; we want to compare resulting date strings exactly.
+    $events = Greg\get_events([
+      'current_time' => $current_time,
+    ]);
+
+    // 2020-11-01 - 2020-11-05
+    $this->assertEquals('11/1 1:30 - 3:00', $events[0]->range('m/j g:i', 'g:i'));
+    $this->assertEquals('11/2 1:30 - 3:00', $events[1]->range('m/j g:i', 'g:i'));
+    $this->assertEquals('11/3 1:30 - 3:00', $events[2]->range('m/j g:i', 'g:i'));
+    $this->assertEquals('11/4 1:30 - 3:00', $events[3]->range('m/j g:i', 'g:i'));
+    $this->assertEquals('11/5 1:30 - 3:00', $events[4]->range('m/j g:i', 'g:i'));
+  }
+
   public function test_event_with_recurrences_and_exceptions() {
     $current_time = '2020-10-31 22:00:00';
 
