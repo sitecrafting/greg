@@ -14,7 +14,6 @@
     <exclude-pattern>wp-content/</exclude-pattern>
     <exclude-pattern>wp/</exclude-pattern>
     <exclude-pattern>vendor/</exclude-pattern>
-    <exclude-pattern>test/themes/</exclude-pattern>
 
     <!-- Use colors in output. -->
     <arg name="colors"/>

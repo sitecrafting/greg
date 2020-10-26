@@ -35,5 +35,3 @@ script:
   - composer run-script test
   - composer run-script sniff
   - composer run-script phpstan
-  # TODO
-  #- composer run-script docs:build
