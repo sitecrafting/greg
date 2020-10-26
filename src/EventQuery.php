@@ -137,10 +137,11 @@ class EventQuery {
    * Get the results for this EventQuery as a collection of zero or more Events
    *
    * @internal
-   * @return list<\Timber\Post>|bool|null
+   * @return array
    */
-  public function get_results() {
-    return Timber::get_posts($this->params());
+  public function get_results() : array {
+    $posts = Timber::get_posts($this->params());
+    return $posts ? $posts->to_array() : [];
   }
 
   /**
