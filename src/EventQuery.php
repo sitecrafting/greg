@@ -137,7 +137,7 @@ class EventQuery {
    * Get the results for this EventQuery as a collection of zero or more Events
    *
    * @internal
-   * @return array
+   * @return array<\Timber\Post>
    */
   public function get_results() : array {
     $posts = Timber::get_posts($this->params());
