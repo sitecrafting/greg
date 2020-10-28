@@ -301,33 +301,37 @@ class CalendarTest extends BaseTest {
   }
 
   /**
-   * @see https://github.com/sitecrafting/greg/issues/4
+   * Issue: https://github.com/sitecrafting/greg/issues/4
    */
   public function test_recurrences_mixed() {
     // multiple events, with the first one recurring
-    $events = [[
-      'start'                  => '2020-10-28 12:00:00',
-      'end'                    => '2020-10-28 12:30:00',
-      'title'                  => 'Recurring Event',
-      'recurrence'             => [
-        'until'                => '2020-11-02 12:30:00',
-        'frequency'            => 'daily',
-        'exceptions'           => [],
+    $events = [
+      [
+        'start'                  => '2020-10-28 12:00:00',
+        'end'                    => '2020-10-28 12:30:00',
+        'title'                  => 'Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-11-02 12:30:00',
+          'frequency'            => 'daily',
+          'exceptions'           => [],
+        ],
+        'recurrence_description' => 'Daily from the 28th thru Nov. 2nd',
       ],
-      'recurrence_description' => 'Daily from the 28th thru Nov. 2nd',
-    ], [
-      'start'                  => '2020-10-29 11:00:00',
-      'end'                    => '2020-10-29 12:00:00',
-      'title'                  => 'Party Planning',
-      'recurrence'             => [],
-      'recurrence_description' => '',
-    ], [
-      'start'                  => '2020-10-31 21:00:00',
-      'end'                    => '2020-10-31 23:30:00',
-      'title'                  => 'Costume Party!',
-      'recurrence'             => [],
-      'recurrence_description' => '',
-    ]];
+      [
+        'start'                  => '2020-10-29 11:00:00',
+        'end'                    => '2020-10-29 12:00:00',
+        'title'                  => 'Party Planning',
+        'recurrence'             => [],
+        'recurrence_description' => '',
+      ],
+      [
+        'start'                  => '2020-10-31 21:00:00',
+        'end'                    => '2020-10-31 23:30:00',
+        'title'                  => 'Costume Party!',
+        'recurrence'             => [],
+        'recurrence_description' => '',
+      ],
+    ];
 
     $calendar = new Calendar($events);
 

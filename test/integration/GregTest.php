@@ -147,7 +147,8 @@ class GregTest extends IntegrationTest {
   }
 
   public function test_get_events_mixed() {
-    $event_data = [[
+    $event_data = [
+    [
       'post_type'                => 'greg_event',
       'post_title'               => 'Costume Party!',
       'post_date'                => '2020-10-21 00:00:00',
@@ -156,7 +157,8 @@ class GregTest extends IntegrationTest {
         'end'                    => '2020-10-31 23:30:00',
         'recurrence_description' => '',
       ],
-    ], [
+    ],
+    [
       'post_type'                => 'greg_event',
       'post_title'               => 'Party Planning',
       'post_date'                => '2020-10-22 00:00:00',
@@ -165,7 +167,8 @@ class GregTest extends IntegrationTest {
         'end'                    => '2020-10-29 12:00:00',
         'recurrence_description' => '',
       ],
-    ], [
+    ],
+    [
       'post_type'                => 'greg_event',
       'post_title'               => 'Recurring Event',
       'post_date'                => '2020-10-23 00:00:00',
@@ -177,7 +180,8 @@ class GregTest extends IntegrationTest {
         'exceptions'             => [],
         'recurrence_description' => 'Daily from the 28th thru Nov. 2nd',
       ],
-    ]];
+    ],
+    ];
 
     foreach ($event_data as $data) {
       $this->factory->post->create($data);
@@ -189,7 +193,6 @@ class GregTest extends IntegrationTest {
     ]);
 
     $summary = array_map(function(Event $recurrence) : string {
-      echo $recurrence->start();
       return $recurrence->title() . ' ' . $recurrence->start('m/j g:i');
     }, $events);
 
