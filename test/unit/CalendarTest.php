@@ -15,6 +15,9 @@ use Greg\Calendar;
  * Test case for the core Calendar library, where we generate recurring event
  * post data.
  *
+ * NOTE: Calendar is not responsible for querying events, only for translating
+ * their recurrence rules into separate instances.
+ *
  * @group unit
  */
 class CalendarTest extends BaseTest {
@@ -28,8 +31,6 @@ class CalendarTest extends BaseTest {
       'title' => 'My Unique Event',
     ];
 
-    // Calendar is not responsible for querying events, only for translating
-    // their recurrence rules into separate instances.
     $calendar = new Calendar([$unique]);
 
     $events = $calendar->recurrences();
@@ -52,43 +53,41 @@ class CalendarTest extends BaseTest {
       'recurrence_description' => 'Thrice',
     ];
 
-    // Calendar is not responsible for querying events, only for translating
-    // their recurrence rules into separate instances.
     $calendar = new Calendar([$recurring]);
 
     $events = $calendar->recurrences();
 
     $this->assertEquals([
-    [
-      'start'                  => '2020-02-03 10:00:00',
-      'end'                    => '2020-02-03 14:00:00',
-      'title'                  => 'My Recurring Event',
-      'recurrence'             => [
-        'until'                => '2020-02-17 14:00:00',
-        'frequency'            => 'Weekly',
+      [
+        'start'                  => '2020-02-03 10:00:00',
+        'end'                    => '2020-02-03 14:00:00',
+        'title'                  => 'My Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-02-17 14:00:00',
+          'frequency'            => 'Weekly',
+        ],
+        'recurrence_description' => 'Thrice',
       ],
-      'recurrence_description' => 'Thrice',
-    ],
-    [
-      'start'                  => '2020-02-10 10:00:00',
-      'end'                    => '2020-02-10 14:00:00',
-      'title'                  => 'My Recurring Event',
-      'recurrence'             => [
-        'until'                => '2020-02-17 14:00:00',
-        'frequency'            => 'Weekly',
+      [
+        'start'                  => '2020-02-10 10:00:00',
+        'end'                    => '2020-02-10 14:00:00',
+        'title'                  => 'My Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-02-17 14:00:00',
+          'frequency'            => 'Weekly',
+        ],
+        'recurrence_description' => 'Thrice',
       ],
-      'recurrence_description' => 'Thrice',
-    ],
-    [
-      'start'                  => '2020-02-17 10:00:00',
-      'end'                    => '2020-02-17 14:00:00',
-      'title'                  => 'My Recurring Event',
-      'recurrence'             => [
-        'until'                => '2020-02-17 14:00:00',
-        'frequency'            => 'Weekly',
+      [
+        'start'                  => '2020-02-17 10:00:00',
+        'end'                    => '2020-02-17 14:00:00',
+        'title'                  => 'My Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-02-17 14:00:00',
+          'frequency'            => 'Weekly',
+        ],
+        'recurrence_description' => 'Thrice',
       ],
-      'recurrence_description' => 'Thrice',
-    ],
     ], $events);
   }
 
@@ -106,43 +105,41 @@ class CalendarTest extends BaseTest {
       ],
     ];
 
-    // Calendar is not responsible for querying events, only for translating
-    // their recurrence rules into separate instances.
     $calendar = new Calendar([$recurring], ['human_readable_format' => 'n/j/y']);
 
     $events = $calendar->recurrences();
 
     $this->assertEquals([
-    [
-      'start'                  => '2020-02-03 10:00:00',
-      'end'                    => '2020-02-03 14:00:00',
-      'title'                  => 'My Recurring Event',
-      'recurrence'             => [
-        'until'                => '2020-02-17 14:00:00',
-        'frequency'            => 'Weekly',
+      [
+        'start'                  => '2020-02-03 10:00:00',
+        'end'                    => '2020-02-03 14:00:00',
+        'title'                  => 'My Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-02-17 14:00:00',
+          'frequency'            => 'Weekly',
+        ],
+        'recurrence_description' => 'weekly, starting from 2/3/20, until 2/17/20',
       ],
-      'recurrence_description' => 'weekly, starting from 2/3/20, until 2/17/20',
-    ],
-    [
-      'start'                  => '2020-02-10 10:00:00',
-      'end'                    => '2020-02-10 14:00:00',
-      'title'                  => 'My Recurring Event',
-      'recurrence'             => [
-        'until'                => '2020-02-17 14:00:00',
-        'frequency'            => 'Weekly',
+      [
+        'start'                  => '2020-02-10 10:00:00',
+        'end'                    => '2020-02-10 14:00:00',
+        'title'                  => 'My Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-02-17 14:00:00',
+          'frequency'            => 'Weekly',
+        ],
+        'recurrence_description' => 'weekly, starting from 2/3/20, until 2/17/20',
       ],
-      'recurrence_description' => 'weekly, starting from 2/3/20, until 2/17/20',
-    ],
-    [
-      'start'                  => '2020-02-17 10:00:00',
-      'end'                    => '2020-02-17 14:00:00',
-      'title'                  => 'My Recurring Event',
-      'recurrence'             => [
-        'until'                => '2020-02-17 14:00:00',
-        'frequency'            => 'Weekly',
+      [
+        'start'                  => '2020-02-17 10:00:00',
+        'end'                    => '2020-02-17 14:00:00',
+        'title'                  => 'My Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-02-17 14:00:00',
+          'frequency'            => 'Weekly',
+        ],
+        'recurrence_description' => 'weekly, starting from 2/3/20, until 2/17/20',
       ],
-      'recurrence_description' => 'weekly, starting from 2/3/20, until 2/17/20',
-    ],
     ], $events);
   }
 
@@ -160,8 +157,6 @@ class CalendarTest extends BaseTest {
       ],
     ];
 
-    // Calendar is not responsible for querying events, only for translating
-    // their recurrence rules into separate instances.
     $calendar = new Calendar([$recurring]);
 
     $events = $calendar->recurrences();
@@ -179,85 +174,83 @@ class CalendarTest extends BaseTest {
     // - 2/4 - 2/5 2pm - 7pm
     //   2 recurrences, daily
     $events = [
-    [
-      'start'                  => '2020-02-04 14:00:00',
-      'end'                    => '2020-02-04 17:00:00',
-      'title'                  => 'Two Times',
-      'recurrence'             => [
-        'until'                => '2020-02-05 17:00:00',
-        'frequency'            => 'Daily',
+      [
+        'start'                  => '2020-02-04 14:00:00',
+        'end'                    => '2020-02-04 17:00:00',
+        'title'                  => 'Two Times',
+        'recurrence'             => [
+          'until'                => '2020-02-05 17:00:00',
+          'frequency'            => 'Daily',
+        ],
+        'recurrence_description' => 'Twice.',
       ],
-      'recurrence_description' => 'Twice.',
-    ],
-    [
-      'start'                  => '2020-02-03 10:00:00',
-      'end'                    => '2020-02-03 15:00:00',
-      'title'                  => 'Three Times',
-      'recurrence'             => [
-        'until'                => '2020-02-05 15:00:00',
-        'frequency'            => 'Daily',
+      [
+        'start'                  => '2020-02-03 10:00:00',
+        'end'                    => '2020-02-03 15:00:00',
+        'title'                  => 'Three Times',
+        'recurrence'             => [
+          'until'                => '2020-02-05 15:00:00',
+          'frequency'            => 'Daily',
+        ],
+        'recurrence_description' => 'Thrice.',
       ],
-      'recurrence_description' => 'Thrice.',
-    ],
     ];
 
-    // Calendar is not responsible for querying events, only for translating
-    // their recurrence rules into separate instances.
     $calendar = new Calendar($events);
 
     $events = $calendar->recurrences();
 
     $this->assertEquals([
-    [
-      'start'                  => '2020-02-03 10:00:00',
-      'end'                    => '2020-02-03 15:00:00',
-      'title'                  => 'Three Times',
-      'recurrence'             => [
-        'until'                => '2020-02-05 15:00:00',
-        'frequency'            => 'Daily',
+      [
+        'start'                  => '2020-02-03 10:00:00',
+        'end'                    => '2020-02-03 15:00:00',
+        'title'                  => 'Three Times',
+        'recurrence'             => [
+          'until'                => '2020-02-05 15:00:00',
+          'frequency'            => 'Daily',
+        ],
+        'recurrence_description' => 'Thrice.',
       ],
-      'recurrence_description' => 'Thrice.',
-    ],
-    [
-      'start'                  => '2020-02-04 10:00:00',
-      'end'                    => '2020-02-04 15:00:00',
-      'title'                  => 'Three Times',
-      'recurrence'             => [
-        'until'                => '2020-02-05 15:00:00',
-        'frequency'            => 'Daily',
+      [
+        'start'                  => '2020-02-04 10:00:00',
+        'end'                    => '2020-02-04 15:00:00',
+        'title'                  => 'Three Times',
+        'recurrence'             => [
+          'until'                => '2020-02-05 15:00:00',
+          'frequency'            => 'Daily',
+        ],
+        'recurrence_description' => 'Thrice.',
       ],
-      'recurrence_description' => 'Thrice.',
-    ],
-    [
-      'start'                  => '2020-02-04 14:00:00',
-      'end'                    => '2020-02-04 17:00:00',
-      'title'                  => 'Two Times',
-      'recurrence'             => [
-        'until'                => '2020-02-05 17:00:00',
-        'frequency'            => 'Daily',
+      [
+        'start'                  => '2020-02-04 14:00:00',
+        'end'                    => '2020-02-04 17:00:00',
+        'title'                  => 'Two Times',
+        'recurrence'             => [
+          'until'                => '2020-02-05 17:00:00',
+          'frequency'            => 'Daily',
+        ],
+        'recurrence_description' => 'Twice.',
       ],
-      'recurrence_description' => 'Twice.',
-    ],
-    [
-      'start'                  => '2020-02-05 10:00:00',
-      'end'                    => '2020-02-05 15:00:00',
-      'title'                  => 'Three Times',
-      'recurrence'             => [
-        'until'                => '2020-02-05 15:00:00',
-        'frequency'            => 'Daily',
+      [
+        'start'                  => '2020-02-05 10:00:00',
+        'end'                    => '2020-02-05 15:00:00',
+        'title'                  => 'Three Times',
+        'recurrence'             => [
+          'until'                => '2020-02-05 15:00:00',
+          'frequency'            => 'Daily',
+        ],
+        'recurrence_description' => 'Thrice.',
       ],
-      'recurrence_description' => 'Thrice.',
-    ],
-    [
-      'start'                  => '2020-02-05 14:00:00',
-      'end'                    => '2020-02-05 17:00:00',
-      'title'                  => 'Two Times',
-      'recurrence'             => [
-        'until'                => '2020-02-05 17:00:00',
-        'frequency'            => 'Daily',
+      [
+        'start'                  => '2020-02-05 14:00:00',
+        'end'                    => '2020-02-05 17:00:00',
+        'title'                  => 'Two Times',
+        'recurrence'             => [
+          'until'                => '2020-02-05 17:00:00',
+          'frequency'            => 'Daily',
+        ],
+        'recurrence_description' => 'Twice.',
       ],
-      'recurrence_description' => 'Twice.',
-    ],
     ], $events);
   }
 
@@ -268,32 +261,30 @@ class CalendarTest extends BaseTest {
     // - 2/4 - 2/5 2pm - 7pm
     //   2 recurrences, daily, two exceptions on 5th and 6th
     $events = [
-    [
-      'start'                  => '2020-02-03 10:00:00',
-      'end'                    => '2020-02-03 15:00:00',
-      'title'                  => 'Three Times',
-      'recurrence'             => [
-        'until'                => '2020-02-07 15:00:00',
-        'frequency'            => 'Daily',
-        'exceptions'           => ['2020-02-04 10:00:00', '2020-02-06 10:00:00'],
+      [
+        'start'                  => '2020-02-03 10:00:00',
+        'end'                    => '2020-02-03 15:00:00',
+        'title'                  => 'Three Times',
+        'recurrence'             => [
+          'until'                => '2020-02-07 15:00:00',
+          'frequency'            => 'Daily',
+          'exceptions'           => ['2020-02-04 10:00:00', '2020-02-06 10:00:00'],
+        ],
+        'recurrence_description' => 'Thrice.',
       ],
-      'recurrence_description' => 'Thrice.',
-    ],
-    [
-      'start'                  => '2020-02-04 14:00:00',
-      'end'                    => '2020-02-04 17:00:00',
-      'title'                  => 'Two Times',
-      'recurrence'             => [
-        'until'                => '2020-02-07 17:00:00',
-        'frequency'            => 'Daily',
-        'exceptions'           => ['2020-02-05 14:00:00', '2020-02-06 14:00:00'],
+      [
+        'start'                  => '2020-02-04 14:00:00',
+        'end'                    => '2020-02-04 17:00:00',
+        'title'                  => 'Two Times',
+        'recurrence'             => [
+          'until'                => '2020-02-07 17:00:00',
+          'frequency'            => 'Daily',
+          'exceptions'           => ['2020-02-05 14:00:00', '2020-02-06 14:00:00'],
+        ],
+        'recurrence_description' => 'Twice.',
       ],
-      'recurrence_description' => 'Twice.',
-    ],
     ];
 
-    // Calendar is not responsible for querying events, only for translating
-    // their recurrence rules into separate instances.
     $calendar = new Calendar($events);
 
     $starts = array_map(function(array $recurrence) {

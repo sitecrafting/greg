@@ -18,7 +18,10 @@ use RRule\RSet;
 
 /**
  * Calendar class for parsing/translating recurrence rules to
- * individual recurrence instances
+ * individual recurrence instances.
+ *
+ * NOTE: Calendar is not responsible for querying events, only for translating
+ * their recurrence rules into separate instances.
  */
 class Calendar {
   /**
