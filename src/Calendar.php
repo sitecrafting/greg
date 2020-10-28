@@ -55,7 +55,14 @@ class Calendar {
    * @return array
    */
   public function recurrences() : array {
-    return array_reduce($this->events, [$this, 'aggregate_recurrences'], []);
+    $recurrences = array_reduce($this->events, [$this, 'aggregate_recurrences'], []);
+
+    // sort by start date
+    usort($recurrences, function(array $a, array $b) : int {
+      return strcmp($a['start'], $b['start']);
+    });
+
+    return $recurrences;
   }
 
   /**
@@ -108,11 +115,6 @@ class Calendar {
         'recurrence_description' => $description,
       ]);
     }
-
-    // sort by start date
-    usort($recurrences, function(array $a, array $b) : int {
-      return strcmp($a['start'], $b['start']);
-    });
 
     return $recurrences;
   }
