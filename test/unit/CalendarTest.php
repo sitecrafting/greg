@@ -299,4 +299,51 @@ class CalendarTest extends BaseTest {
       '2020-02-07 14:00:00',
     ], $starts);
   }
+
+  /**
+   * @see https://github.com/sitecrafting/greg/issues/4
+   */
+  public function test_recurrences_mixed() {
+    // multiple events, with the first one recurring
+    $events = [[
+      'start'                  => '2020-10-28 12:00:00',
+      'end'                    => '2020-10-28 12:30:00',
+      'title'                  => 'Recurring Event',
+      'recurrence'             => [
+        'until'                => '2020-11-02 12:30:00',
+        'frequency'            => 'daily',
+        'exceptions'           => [],
+      ],
+      'recurrence_description' => 'Daily from the 28th thru Nov. 2nd',
+    ], [
+      'start'                  => '2020-10-29 11:00:00',
+      'end'                    => '2020-10-29 12:00:00',
+      'title'                  => 'Party Planning',
+      'recurrence'             => [],
+      'recurrence_description' => '',
+    ], [
+      'start'                  => '2020-10-31 21:00:00',
+      'end'                    => '2020-10-31 23:30:00',
+      'title'                  => 'Costume Party!',
+      'recurrence'             => [],
+      'recurrence_description' => '',
+    ]];
+
+    $calendar = new Calendar($events);
+
+    $summary = array_map(function(array $recurrence) {
+      return $recurrence['title'] . ' ' . $recurrence['start'];
+    }, $calendar->recurrences());
+
+    $this->assertEquals([
+      'Recurring Event 2020-10-28 12:00:00',
+      'Party Planning 2020-10-29 11:00:00',
+      'Recurring Event 2020-10-29 12:00:00',
+      'Recurring Event 2020-10-30 12:00:00',
+      'Recurring Event 2020-10-31 12:00:00',
+      'Costume Party! 2020-10-31 21:00:00',
+      'Recurring Event 2020-11-01 12:00:00',
+      'Recurring Event 2020-11-02 12:00:00',
+    ], $summary);
+  }
 }
