@@ -212,13 +212,7 @@ class EventQuery {
       $meta[] = [
         'relation' => 'OR',
         [
-          'key'     => $this->meta_keys['end'],
-          'value'   => $end,
-          'compare' => '<=',
-          'type'    => 'DATETIME',
-        ],
-        [
-          'key'     => $this->meta_keys['until'],
+          'key'     => [$this->meta_keys['end'], $this->meta_keys['until']],
           'value'   => $end,
           'compare' => '<=',
           'type'    => 'DATETIME',

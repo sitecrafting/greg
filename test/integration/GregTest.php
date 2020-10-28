@@ -36,7 +36,7 @@ class GregTest extends IntegrationTest {
       'post_title' => 'My Old Event',
       'meta_input' => [
         'start'    => date_create_immutable('now')->modify('-6 weeks')->format('Y-m-d 00:00:00'),
-        'end'      => date_create_immutable('now')->modify('+5 weeks')->format('Y-m-d 00:00:00'),
+        'end'      => date_create_immutable('now')->modify('-5 weeks')->format('Y-m-d 00:00:00'),
       ],
     ]);
     $this->factory->post->create([
@@ -206,5 +206,94 @@ class GregTest extends IntegrationTest {
       'Recurring Event 11/1 12:00',
       'Recurring Event 11/2 12:00',
     ], $summary);
+  }
+
+  /**
+   * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
+   */
+  public function test_get_events_limit_earliest() {
+    $this->markTestSkipped();
+    // multiple events, with the first one recurring
+    $this->factory->post->create([
+      'post_title'   => 'Recurring Event',
+      'post_type'    => 'greg_event',
+      'meta_input'   => [
+        'start'      => '2020-09-25 12:00:00',
+        'end'        => '2020-09-25 12:30:00',
+        'until'      => '2020-11-15 12:00:00',
+        'frequency'  => 'daily',
+        'exceptions' => [],
+      ],
+    ]);
+
+    $recurrences = Greg\get_events([
+      'start_date' => '2020-10-01',
+    ]);
+
+    $this->assertCount(31 + 15, $recurrences);
+    $this->assertEquals('2020-10-01', $recurrences[0]->start('Y-m-d'));
+    $this->assertEquals('2020-11-15', $recurrences[45]->start('Y-m-d'));
+  }
+
+  /**
+   * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
+   */
+  public function test_get_events_limit_latest() {
+    $this->markTestSkipped();
+    // multiple events, with the first one recurring
+    $events = [
+      [
+        'start'                  => '2020-09-25 12:00:00',
+        'end'                    => '2020-09-25 12:30:00',
+        'title'                  => 'Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-11-15 12:00:00',
+          'frequency'            => 'daily',
+          'exceptions'           => [],
+        ],
+        'recurrence_description' => 'Daily for a hecka long time',
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences([
+      'latest' => '2020-10-31 23:59:59',
+    ]);
+
+    $this->assertCount(6 + 31, $recurrences);
+    $this->assertEquals('2020-09-25 12:00:00', $recurrences[0]['start']);
+    $this->assertEquals('2020-10-31 12:00:00', $recurrences[36]['start']);
+  }
+
+  /**
+   * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
+   */
+  public function test_get_events_limit_event_month() {
+    $this->markTestSkipped();
+    // multiple events, with the first one recurring
+    $events = [
+      [
+        'start'                  => '2020-09-25 12:00:00',
+        'end'                    => '2020-09-25 12:30:00',
+        'title'                  => 'Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-11-15 12:00:00',
+          'frequency'            => 'daily',
+          'exceptions'           => [],
+        ],
+        'recurrence_description' => 'Daily for a hecka long time',
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences([
+      'event_month' => '2020-10',
+    ]);
+
+    $this->assertCount(31, $recurrences);
+    $this->assertEquals('2020-10-01 12:00:00', $recurrences[0]['start']);
+    $this->assertEquals('2020-10-31 12:00:00', $recurrences[30]['start']);
   }
 }
