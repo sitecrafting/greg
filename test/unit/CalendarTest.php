@@ -301,7 +301,7 @@ class CalendarTest extends BaseTest {
   }
 
   /**
-   * Issue: https://github.com/sitecrafting/greg/issues/4
+   * Test sorting issue: https://github.com/sitecrafting/greg/issues/4
    */
   public function test_recurrences_mixed() {
     // multiple events, with the first one recurring
@@ -349,5 +349,121 @@ class CalendarTest extends BaseTest {
       'Recurring Event 2020-11-01 12:00:00',
       'Recurring Event 2020-11-02 12:00:00',
     ], $summary);
+  }
+
+  /**
+   * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
+   */
+  public function test_recurrences_limit_earliest() {
+    // multiple events, with the first one recurring
+    $events = [
+      [
+        'start'                  => '2020-09-25 12:00:00',
+        'end'                    => '2020-09-25 12:30:00',
+        'title'                  => 'Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-11-15 12:00:00',
+          'frequency'            => 'daily',
+          'exceptions'           => [],
+        ],
+        'recurrence_description' => 'Daily for a hecka long time',
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences([
+      'earliest' => '2020-10-01',
+    ]);
+
+    $this->assertCount(31 + 15, $recurrences);
+    $this->assertEquals('2020-10-01 12:00:00', $recurrences[0]['start']);
+    $this->assertEquals('2020-11-15 12:00:00', $recurrences[45]['start']);
+  }
+
+  /**
+   * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
+   */
+  public function test_recurrences_limit_latest() {
+    // multiple events, with the first one recurring
+    $events = [
+      [
+        'start'                  => '2020-09-25 12:00:00',
+        'end'                    => '2020-09-25 12:30:00',
+        'title'                  => 'Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-11-15 12:00:00',
+          'frequency'            => 'daily',
+          'exceptions'           => [],
+        ],
+        'recurrence_description' => 'Daily for a hecka long time',
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences([
+      'latest' => '2020-10-31 23:59:59',
+    ]);
+
+    $this->assertCount(6 + 31, $recurrences);
+    $this->assertEquals('2020-09-25 12:00:00', $recurrences[0]['start']);
+    $this->assertEquals('2020-10-31 12:00:00', $recurrences[36]['start']);
+  }
+
+  /**
+   * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
+   */
+  public function test_recurrences_limit_event_month() {
+    // multiple events, with the first one recurring
+    $events = [
+      [
+        'start'                  => '2020-09-25 12:00:00',
+        'end'                    => '2020-09-25 12:30:00',
+        'title'                  => 'Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-11-15 12:00:00',
+          'frequency'            => 'daily',
+          'exceptions'           => [],
+        ],
+        'recurrence_description' => 'Daily for a hecka long time',
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences([
+      'event_month' => '2020-10',
+    ]);
+
+    $this->assertCount(31, $recurrences);
+    $this->assertEquals('2020-10-01 12:00:00', $recurrences[0]['start']);
+    $this->assertEquals('2020-10-31 12:00:00', $recurrences[30]['start']);
+  }
+
+  /**
+   * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
+   */
+  public function test_recurrences_limit_event_month_garbage() {
+    // multiple events, with the first one recurring
+    $events = [
+      [
+        'start'                  => '2020-09-25 12:00:00',
+        'end'                    => '2020-09-25 12:30:00',
+        'title'                  => 'Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-11-15 12:00:00',
+          'frequency'            => 'daily',
+          'exceptions'           => [],
+        ],
+        'recurrence_description' => 'Daily for a hecka long time',
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $this->assertEmpty($calendar->recurrences([
+      'event_month' => 'GARBAGE',
+    ]));
   }
 }

@@ -13,6 +13,7 @@ use DateTime;
 use DateTimeInterface;
 use DateTimeImmutable;
 use DateInterval;
+use InvalidArgumentException;
 use RRule\RRule;
 use RRule\RSet;
 
@@ -52,10 +53,23 @@ class Calendar {
   /**
    * Get an array of events, parsed out into individual recurrences
    *
+   * @param array $opts optional additional constraints to place on the recurrences,
+   * for example if querying by event_month when multi-month recurring events
+   * show up in the query results. Supported options:
+   * * earliest: date string
+   * * latest: date string
+   * * event_month: shorthand for: [
+   *     'earliest' => (first of month),
+   *     'latest'   => (last of month),
+   *   ]
    * @return array
    */
-  public function recurrences() : array {
-    $recurrences = array_reduce($this->events, [$this, 'aggregate_recurrences'], []);
+  public function recurrences(array $opts = []) : array {
+    $reducer = function(array $recurrences, array $event) use ($opts) : array {
+      return $this->aggregate_recurrence($recurrences, $event, $opts);
+    };
+
+    $recurrences = array_reduce($this->events, $reducer, []);
 
     // sort by start date
     usort($recurrences, function(array $a, array $b) : int {
@@ -71,9 +85,15 @@ class Calendar {
    *
    * @param array $recurrences recurrences we've already collected
    * @param array $event the event series data to parse out and add
+   * @param array $constraints extra constraints that each event should
+   * fulfill to be included in the final aggregate
    * @return array the aggregated recurrence data
    */
-  protected function aggregate_recurrences(array $recurrences, array $event) : array {
+  protected function aggregate_recurrence(
+    array $recurrences,
+    array $event,
+    array $constraints
+  ) : array {
     if (empty($event['recurrence'])) {
       // no recurrence rules to parse; just add this event
       // to the aggregate and return
@@ -108,15 +128,59 @@ class Calendar {
     $description = $this->describe($event, $rrule);
 
     foreach ($rset->getOccurrences() as $recurrence) {
-      $end           = $this->end_from_start($recurrence, $duration);
-      $recurrences[] = array_merge($event, [
+      $end        = $this->end_from_start($recurrence, $duration);
+      $recurrence = array_merge($event, [
         'start'                  => $recurrence->format('Y-m-d H:i:s'),
         'end'                    => $end->format('Y-m-d H:i:s'),
         'recurrence_description' => $description,
       ]);
+
+      if ($this->fulfills($recurrence, $constraints)) {
+        $recurrences[] = $recurrence;
+      }
     }
 
     return $recurrences;
+  }
+
+  /**
+   * Whether the given event/recurrence fulfills all $constraints
+   *
+   * @param array $recurrence the recurrence/event in question
+   * @param array $constraints the constraints by which events should be limited
+   * @return bool
+   */
+  protected function fulfills(array $recurrence, array $constraints) : bool {
+    if (!empty($constraints['event_month'])) {
+      $month = date_create_immutable($constraints['event_month']);
+      if (!$month) {
+        // We can't parse this; assume no match.
+        return false;
+      }
+
+      $constraints['earliest'] = $month->format('Y-m-01 00:00:00');
+
+      $constraints['latest'] = $month
+        ->modify('+1 month')
+        ->modify('-1 second')
+        ->format('Y-m-d 23:59:59');
+    }
+
+    if (
+      !empty($constraints['earliest'])
+      && $recurrence['start'] < $constraints['earliest']
+    ) {
+      return false;
+    }
+
+    if (
+      !empty($constraints['latest'])
+      && $recurrence['start'] > $constraints['latest']
+    ) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
