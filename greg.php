@@ -23,7 +23,6 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 use Timber\Timber;
 use Twig\TwigFunction;
 use Twig\Environment;
-use WP;
 
 use Greg\Event;
 use Greg\Rest\RestController;
