@@ -98,6 +98,22 @@ add_filter('greg/meta_keys', function() : array {
   return Event::DEFAULT_META_KEYS;
 });
 
+/**
+ * Set up default params
+ */
+add_filter('greg/params', function(array $params) : array {
+  global $wp_query;
+  if (
+    empty($params['event_category']) &&
+    $wp_query->is_tax() &&
+    !empty($wp_query->tax_query->queried_terms['greg_event_category'])
+  ) {
+    $params['event_category'] = Timber::get_term()->id ?? null;
+  }
+
+  return $params;
+});
+
 
 /*
  * Add REST Routes

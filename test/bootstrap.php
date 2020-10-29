@@ -13,5 +13,7 @@ if (is_dir(__DIR__ . '/wp-tests-lib')) {
   require_once __DIR__ . '/wp-tests-lib/includes/bootstrap.php';
 }
 
+require_once __DIR__ . '/../greg.php';
+
 // Define any constants here for testing purposes...
 

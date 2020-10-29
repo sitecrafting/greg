@@ -101,6 +101,8 @@ function get_events(array $params = []) {
     'meta_keys'    => apply_filters('greg/meta_keys', []),
   ], $params);
 
+  $params = apply_filters('greg/params', $params);
+
   try {
     $query = new EventQuery($params);
   } catch (InvalidArgumentException $e) {
