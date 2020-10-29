@@ -119,7 +119,6 @@ Now we're ready to actually fetch our posts. To do that we call `Greg\get_events
 ```php
 /* archive-greg_event.php */
 
-use Greg;
 use Timber\Timber;
 
 $event = Greg\get_events();
@@ -232,8 +231,6 @@ Greg takes full advantage of Timber's use of the [Twig template engine](https://
 You can render a Twig view from PHP with the `Greg\render()` function:
 
 ```php
-use Greg;
-
 Greg\render('event-categories.twig');
 ```
 
@@ -242,8 +239,6 @@ Note that unlike `Timber::render()`, a static method on the Timber class, this i
 Like `Timber::render()`, it takes an optional array of data to pass to the Twig view:
 
 ```php
-use Greg;
-
 Greg\render('event-categories.twig', [
   'extra' => 'stuff',
 ]);
