@@ -89,7 +89,7 @@ add_action('init', function() {
     ],
   ]);
 
-  WP::add_query_var('event_month');
+  $GLOBALS['wp']->add_query_var('event_month');
 });
 
 

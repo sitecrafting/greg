@@ -328,4 +328,54 @@ class GregTest extends IntegrationTest {
 
     $this->assertEquals('2020-10', apply_filters('greg/params', [])['event_month']);
   }
+
+  public function test_event_month_default() {
+    // @phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+    $this->assertEquals(date('Y-m'), Greg\event_month());
+  }
+
+  public function test_event_month() {
+    set_query_var('event_month', '2020-09');
+    $this->assertEquals('2020-09', Greg\event_month());
+  }
+
+  public function test_event_month_format() {
+    set_query_var('event_month', '2020-09');
+    $this->assertEquals('September 2020', Greg\event_month('F Y'));
+  }
+
+  public function test_event_month_garbage() {
+    set_query_var('event_month', 'COMPLETE GARBAGE');
+    $this->assertEquals('', Greg\event_month());
+  }
+
+  public function test_prev_month() {
+    set_query_var('event_month', '2020-09');
+    $this->assertEquals('2020-08', Greg\prev_month());
+  }
+
+  public function test_prev_month_format() {
+    set_query_var('event_month', '2020-09');
+    $this->assertEquals('August 2020', Greg\prev_month('F Y'));
+  }
+
+  public function test_prev_month_garbage() {
+    set_query_var('event_month', 'NO NO NO NO NO NO');
+    $this->assertEquals('', Greg\prev_month());
+  }
+
+  public function test_next_month() {
+    set_query_var('event_month', '2020-09');
+    $this->assertEquals('2020-10', Greg\next_month());
+  }
+
+  public function test_next_month_format() {
+    set_query_var('event_month', '2020-09');
+    $this->assertEquals('October 2020', Greg\next_month('F Y'));
+  }
+
+  public function test_next_month_garbage() {
+    set_query_var('event_month', 'NOT THIS GARBAGE AGAIN');
+    $this->assertEquals('', Greg\next_month());
+  }
 }

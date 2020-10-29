@@ -9,6 +9,7 @@
 
 namespace Greg;
 
+use DateTimeImmutable;
 use InvalidArgumentException;
 use Timber\Timber;
 
@@ -135,7 +136,7 @@ function get_events(array $params = []) {
  * * until
  * * frequency
  * * exceptions
- * * recurrence_descriptions
+ * * recurrence_description
  * @return string
  * @throws InvalidArgumentException if passed a bad field name, or if the key
  * does not exist in the configured greg/meta_fields hook.
@@ -150,4 +151,55 @@ function meta_key(string $field) : string {
     ));
   }
   return $key;
+}
+
+/**
+ * Get the currently queried month (according to the event_month query var),
+ * formatted as a string. Note that by default the underlying timestamp is the
+ * start of the current month at midnight.
+ *
+ * @param string $format date string format. Default: "Y-m"
+ * @return string the formatted event_month string, or the empty string if
+ * event_month is not parseable
+ */
+function event_month(string $format = 'Y-m') : string {
+  $month_dt = month_datetime();
+  return $month_dt ? $month_dt->format($format) : '';
+}
+
+/**
+ * Get the previous month based on event_month/current time query var (in that
+ * order).
+ *
+ * @param string $format date string format. Default: "Y-m"
+ * @return string the formatted date string, or the empty string if
+ * event_month is not parseable
+ */
+function prev_month(string $format = 'Y-m') : string {
+  $month_dt = month_datetime();
+  return $month_dt ? $month_dt->modify('-1 month')->format($format) : '';
+}
+
+/**
+ * Get the next month based on event_month/current time query var (in that
+ * order).
+ *
+ * @param string $format date string format. Default: "Y-m"
+ * @return string the formatted date string, or the empty string if
+ * event_month is not parseable
+ */
+function next_month(string $format = 'Y-m') : string {
+  $month_dt = month_datetime();
+  return $month_dt ? $month_dt->modify('+1 month')->format($format) : '';
+}
+
+/**
+ * Get the currently queried month (according to the event_month query var),
+ * as a DateTimeImmutable object.
+ *
+ * @return DateTimeImmutable|false a DateTimeImmutable instance of false if
+ * event_month is not parseable
+ */
+function month_datetime() {
+  return date_create_immutable(get_query_var('event_month') ?: 'now');
 }
