@@ -99,9 +99,16 @@ add_filter('greg/meta_keys', function() : array {
 });
 
 /**
- * Set up default params
+ * Set up default params.
  */
 add_filter('greg/params', function(array $params) : array {
+  // Defaults.
+  $params = array_merge([
+    'current_time' => gmdate('Y-m-d H:i:s'),
+    'meta_keys'    => apply_filters('greg/meta_keys', []),
+  ], $params);
+
+  // Query by current event category on Greg archive pages.
   global $wp_query;
   if (
     empty($params['event_category']) &&

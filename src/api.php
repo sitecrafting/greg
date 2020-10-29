@@ -96,11 +96,6 @@ function render(string $view, array $data = []) : void {
  * @return array|false
  */
 function get_events(array $params = []) {
-  $params = array_merge([
-    'current_time' => gmdate('Y-m-d H:i:s'),
-    'meta_keys'    => apply_filters('greg/meta_keys', []),
-  ], $params);
-
   $params = apply_filters('greg/params', $params);
 
   try {
