@@ -66,7 +66,7 @@ class Calendar {
    */
   public function recurrences(array $opts = []) : array {
     $reducer = function(array $recurrences, array $event) use ($opts) : array {
-      return $this->aggregate_recurrence($recurrences, $event, $opts);
+      return $this->aggregate_recurrences($recurrences, $event, $opts);
     };
 
     $recurrences = array_reduce($this->events, $reducer, []);
@@ -89,7 +89,7 @@ class Calendar {
    * fulfill to be included in the final aggregate
    * @return array the aggregated recurrence data
    */
-  protected function aggregate_recurrence(
+  protected function aggregate_recurrences(
     array $recurrences,
     array $event,
     array $constraints
