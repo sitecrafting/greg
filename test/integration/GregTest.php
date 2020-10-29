@@ -322,4 +322,10 @@ class GregTest extends IntegrationTest {
     $this->assertEquals('COME PLAY WITH DOGS', $events[0]->title());
     $this->assertEquals('Dogs', $events[0]->terms('greg_event_category')[0]->title());
   }
+
+  public function test_params_filter_default_month() {
+    set_query_var('event_month', '2020-10');
+
+    $this->assertEquals('2020-10', apply_filters('greg/params', [])['event_month']);
+  }
 }
