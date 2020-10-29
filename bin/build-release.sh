@@ -39,25 +39,29 @@ function main() {
   # prompt for the letter "v"
   first_char="${RELEASE:0:1}"
   if ! [[ "$first_char" = 'v' ]] ; then
-    read -p "Prepend a 'v' (v${RELEASE})? (y/N) " prepend
+    if [[ -z $NO_INTERACTION ]] ; then
+      read -p "Prepend a 'v' (v${RELEASE})? (y/N) " prepend
+    fi
     if [[ "$prepend" = "y" ]] ; then
       RELEASE="v${RELEASE}"
     fi
   fi
 
-  # check tag
-  git rev-parse --verify "$RELEASE" 2>/dev/null
-  if ! [[ "$?" -eq 0 ]] ; then
+  if [[ -z $NO_INTERACTION ]] ; then
+    # check tag
+    git rev-parse --verify "$RELEASE" 2>/dev/null
+    if ! [[ "$?" -eq 0 ]] ; then
 
-    # prompt for creating a tag
-    read -p "'${RELEASE}' is not a Git revision. Create tag ${RELEASE}? (y/N) " create
-    if ! [[ "$create" = "y" ]] ; then
-      echo 'aborted.'
-      exit
+      # prompt for creating a tag
+      read -p "'${RELEASE}' is not a Git revision. Create tag ${RELEASE}? (y/N) " create
+      if ! [[ "$create" = "y" ]] ; then
+        echo 'aborted.'
+        exit
+      fi
+
+      # create the tag
+      git tag "$RELEASE"
     fi
-
-    # create the tag
-    git tag "$RELEASE"
   fi
 
   backup_vendor
@@ -97,7 +101,9 @@ function main() {
 
   echo "Created ${tar_name}, ${zip_name}"
 
-  create_github_release "$RELEASE" "$tar_name" "$zip_name"
+  if [[ -z $NO_INTERACTION ]] ; then
+    create_github_release "$RELEASE" "$tar_name" "$zip_name"
+  fi
 }
 
 function create_github_release() {
@@ -150,6 +156,10 @@ case $key in
     # show usage and bail
     usage
     exit
+    ;;
+  -n|--no-interaction)
+    NO_INTERACTION=1
+    shift # past flag
     ;;
   *)
     POSITIONAL+=("$1") # save it in an array for later
