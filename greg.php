@@ -23,6 +23,7 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 use Timber\Timber;
 use Twig\TwigFunction;
 use Twig\Environment;
+use WP;
 
 use Greg\Event;
 use Greg\Rest\RestController;
@@ -88,6 +89,8 @@ add_action('init', function() {
       'back_to_items'              => '← Back to Event Categories',
     ],
   ]);
+
+  WP::add_query_var('event_month');
 });
 
 
@@ -96,6 +99,31 @@ add_action('init', function() {
  */
 add_filter('greg/meta_keys', function() : array {
   return Event::DEFAULT_META_KEYS;
+});
+
+/**
+ * Set up default params.
+ */
+add_filter('greg/params', function(array $params) : array {
+  // Defaults.
+  $params = array_merge([
+    'current_time' => gmdate('Y-m-d H:i:s'),
+    'meta_keys'    => apply_filters('greg/meta_keys', []),
+    // Unless explicitly passed, keep event_month unset.
+    'event_month'  => get_query_var('event_month') ?: null,
+  ], $params);
+
+  // Query by current event category on Greg archive pages.
+  global $wp_query;
+  if (
+    empty($params['event_category']) &&
+    $wp_query->is_tax() &&
+    !empty($wp_query->tax_query->queried_terms['greg_event_category'])
+  ) {
+    $params['event_category'] = Timber::get_term()->id ?? null;
+  }
+
+  return $params;
 });
 
 

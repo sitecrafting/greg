@@ -280,4 +280,52 @@ class GregTest extends IntegrationTest {
     $this->assertEquals('2020-10-01', $recurrences[0]->start('Y-m-d'));
     $this->assertEquals('2020-10-31', $recurrences[30]->start('Y-m-d'));
   }
+
+  public function test_get_events_by_category() {
+    $term_id = $this->factory->term->create([
+      'taxonomy' => 'greg_event_category',
+      'name'     => 'Dogs',
+      'slug'     => 'dogs',
+    ]);
+
+    $id = $this->factory->post->create([
+      'post_title'   => 'COME PLAY WITH DOGS',
+      'post_type'    => 'greg_event',
+      'meta_input'   => [
+        'start'      => '2020-09-25 12:00:00',
+        'end'        => '2020-09-25 12:30:00',
+        'until'      => '2020-11-15 12:00:00',
+        'frequency'  => 'daily',
+        'exceptions' => [],
+      ],
+    ]);
+    wp_set_post_terms($id, [$term_id], 'greg_event_category');
+
+    $this->factory->post->create_many(3, [
+      'post_type'    => 'greg_event',
+      'meta_input'   => [
+        'start'      => '2020-09-25 12:00:00',
+        'end'        => '2020-09-25 12:30:00',
+        'until'      => '2020-11-15 12:00:00',
+        'frequency'  => 'daily',
+        'exceptions' => [],
+      ],
+    ]);
+
+    $events = Greg\get_events([
+      'event_month'        => '2020-10',
+      'event_category'     => 'dogs',
+      'expand_recurrences' => false,
+    ]);
+
+    $this->assertCount(1, $events);
+    $this->assertEquals('COME PLAY WITH DOGS', $events[0]->title());
+    $this->assertEquals('Dogs', $events[0]->terms('greg_event_category')[0]->title());
+  }
+
+  public function test_params_filter_default_month() {
+    set_query_var('event_month', '2020-10');
+
+    $this->assertEquals('2020-10', apply_filters('greg/params', [])['event_month']);
+  }
 }
