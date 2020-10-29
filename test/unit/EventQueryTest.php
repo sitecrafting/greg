@@ -15,6 +15,17 @@ use Greg\EventQuery;
 /**
  * Test case for the core query logic within the public Greg API.
  *
+ * TESTING STRATEGY:
+ *
+ * There are three cases we really care about.
+ *
+ * 1.) start meta_value is BETWEEN start_date and end_date filters
+ * 2.) start_date filter is BETWEEN start meta_value and end meta_value
+ * 3.) end/until meta_value is BETWEEN start_date and end_date filters
+ *
+ * Note that we don't include a "end_date filter BETWEEN start/end meta" case
+ * because it's actually redundant.
+ *
  * @group unit
  */
 class EventQueryTest extends BaseTest {
@@ -25,29 +36,40 @@ class EventQueryTest extends BaseTest {
     ]);
 
     $this->assertEquals([
-      // Include events that started after the first of the current month
-      // after midnight.
-      'key'     => 'start',
-      'value'   => '2020-10-01 00:00:00',
-      'compare' => '>=',
-      'type'    => 'DATETIME',
+      'relation'    => 'OR',
+      [
+        // event.start BETWEEN start/end filters
+        'key'       => 'start',
+        'value'     => ['2020-10-01 00:00:00', '2020-10-31 23:59:59'],
+        'compare'   => 'BETWEEN',
+        'type'      => 'DATETIME',
+      ],
+      [
+        // start filter is BETWEEN event.start AND event.end/event.until
+        'relation'  => 'AND',
+        [
+          // event.start <= start filter
+          'key'     => 'start',
+          'value'   => '2020-10-01 00:00:00',
+          'compare' => '<=',
+          'type'    => 'DATETIME',
+        ],
+        [
+          // event.end/event.until > start filter
+          'key'     => ['end', 'until'],
+          'value'   => '2020-10-01 00:00:00',
+          'compare' => '>',
+          'type'    => 'DATETIME',
+        ],
+      ],
+      [
+        // event.end/event.until BETWEEN start/end filters
+        'key'       => ['end', 'until'],
+        'value'     => ['2020-10-01 00:00:00', '2020-10-31 23:59:59'],
+        'compare'   => 'BETWEEN',
+        'type'      => 'DATETIME',
+      ],
     ], $query->params()['meta_query'][0]);
-    $this->assertEquals([
-      'relation' => 'OR',
-      // Include events up to the end of the current month
-      [
-        'key'     => 'end',
-        'value'   => '2020-10-31 23:59:59',
-        'compare' => '<=',
-        'type'    => 'DATETIME',
-      ],
-      [
-        'key'     => 'until',
-        'value'   => '2020-10-31 23:59:59',
-        'compare' => '<=',
-        'type'    => 'DATETIME',
-      ],
-    ], $query->params()['meta_query'][1]);
   }
 
   public function test_params_truncating_event_month() {
@@ -60,27 +82,38 @@ class EventQueryTest extends BaseTest {
     ]);
 
     $this->assertEquals([
-      'key'     => 'start',
-      'value'   => '2020-10-15 00:00:00',
-      'compare' => '>=',
-      'type'    => 'DATETIME',
+      'relation'    => 'OR',
+      [
+        'key'       => 'start',
+        'value'     => ['2020-10-15 00:00:00', '2020-10-31 23:59:59'],
+        'compare'   => 'BETWEEN',
+        'type'      => 'DATETIME',
+      ],
+      [
+        // start filter is BETWEEN event.start AND event.end/event.until
+        'relation'  => 'AND',
+        [
+          // event.start <= start filter
+          'key'     => 'start',
+          'value'   => '2020-10-15 00:00:00',
+          'compare' => '<=',
+          'type'    => 'DATETIME',
+        ],
+        [
+          // event.end/event.until > start filter
+          'key'     => ['end', 'until'],
+          'value'   => '2020-10-15 00:00:00',
+          'compare' => '>',
+          'type'    => 'DATETIME',
+        ],
+      ],
+      [
+        'key'       => ['end', 'until'],
+        'value'     => ['2020-10-15 00:00:00', '2020-10-31 23:59:59'],
+        'compare'   => 'BETWEEN',
+        'type'      => 'DATETIME',
+      ],
     ], $query->params()['meta_query'][0]);
-    $this->assertEquals([
-      'relation' => 'OR',
-      // Include events up to the end of the current month
-      [
-        'key'     => 'end',
-        'value'   => '2020-10-31 23:59:59',
-        'compare' => '<=',
-        'type'    => 'DATETIME',
-      ],
-      [
-        'key'     => 'until',
-        'value'   => '2020-10-31 23:59:59',
-        'compare' => '<=',
-        'type'    => 'DATETIME',
-      ],
-    ], $query->params()['meta_query'][1]);
   }
 
   public function test_params_outside_current_month() {
@@ -90,29 +123,39 @@ class EventQueryTest extends BaseTest {
     ]);
 
     $this->assertEquals([
-      // Include events that started the first of start_date's month
-      // at midnight, or later.
-      'key'     => 'start',
-      'value'   => '2020-09-01 00:00:00',
-      'compare' => '>=',
-      'type'    => 'DATETIME',
+      'relation'    => 'OR',
+      [
+        // event.start is BETWEEN first and last day of filterd month
+        'key'       => 'start',
+        'value'     => ['2020-09-01 00:00:00', '2020-09-30 23:59:59'],
+        'compare'   => 'BETWEEN',
+        'type'      => 'DATETIME',
+      ],
+      [
+        // start filter is BETWEEN event.start AND event.end/event.until
+        'relation'  => 'AND',
+        [
+          // event.start <= start filter
+          'key'     => 'start',
+          'value'   => '2020-09-01 00:00:00',
+          'compare' => '<=',
+          'type'    => 'DATETIME',
+        ],
+        [
+          // event.end/event.until > start filter
+          'key'     => ['end', 'until'],
+          'value'   => '2020-09-01 00:00:00',
+          'compare' => '>',
+          'type'    => 'DATETIME',
+        ],
+      ],
+      [
+        'key'       => ['end', 'until'],
+        'value'     => ['2020-09-01 00:00:00', '2020-09-30 23:59:59'],
+        'compare'   => 'BETWEEN',
+        'type'      => 'DATETIME',
+      ],
     ], $query->params()['meta_query'][0]);
-    $this->assertEquals([
-      'relation' => 'OR',
-      // Include events up to the end of the current month
-      [
-        'key'     => 'end',
-        'value'   => '2020-09-30 23:59:59',
-        'compare' => '<=',
-        'type'    => 'DATETIME',
-      ],
-      [
-        'key'     => 'until',
-        'value'   => '2020-09-30 23:59:59',
-        'compare' => '<=',
-        'type'    => 'DATETIME',
-      ],
-    ], $query->params()['meta_query'][1]);
   }
 
   public function test_params_garbage_current_time() {
@@ -161,27 +204,39 @@ class EventQueryTest extends BaseTest {
     ]);
 
     $this->assertEquals([
-      'key'     => 'start',
-      'value'   => '2020-10-03 00:00:00',
-      'compare' => '>=',
-      'type'    => 'DATETIME',
+      'relation'    => 'OR',
+      [
+        'key'       => 'start',
+        'value'     => ['2020-10-03 00:00:00', '2020-10-31 23:59:59'],
+        'compare'   => 'BETWEEN',
+        'type'      => 'DATETIME',
+      ],
+      [
+        // start filter is BETWEEN event.start AND event.end/event.until
+        'relation'  => 'AND',
+        [
+          // event.start <= start filter
+          'key'     => 'start',
+          'value'   => '2020-10-03 00:00:00',
+          'compare' => '<=',
+          'type'    => 'DATETIME',
+        ],
+        [
+          // event.end/event.until > start filter
+          'key'     => ['end', 'until'],
+          'value'   => '2020-10-03 00:00:00',
+          'compare' => '>',
+          'type'    => 'DATETIME',
+        ],
+      ],
+      // End filter defaults to end of the month in which start filter occurs.
+      [
+        'key'       => ['end', 'until'],
+        'value'     => ['2020-10-03 00:00:00', '2020-10-31 23:59:59'],
+        'compare'   => 'BETWEEN',
+        'type'      => 'DATETIME',
+      ],
     ], $query->params()['meta_query'][0]);
-    $this->assertEquals([
-      'relation' => 'OR',
-      // Include events up to the end of the current month
-      [
-        'key'     => 'end',
-        'value'   => '2020-10-31 23:59:59',
-        'compare' => '<=',
-        'type'    => 'DATETIME',
-      ],
-      [
-        'key'     => 'until',
-        'value'   => '2020-10-31 23:59:59',
-        'compare' => '<=',
-        'type'    => 'DATETIME',
-      ],
-    ], $query->params()['meta_query'][1]);
   }
 
   public function test_params_start_and_end_dates() {
@@ -192,27 +247,38 @@ class EventQueryTest extends BaseTest {
     ]);
 
     $this->assertEquals([
-      'key'     => 'start',
-      'value'   => '2020-10-03 00:00:00',
-      'compare' => '>=',
-      'type'    => 'DATETIME',
+      'relation'    => 'OR',
+      [
+        'key'       => 'start',
+        'value'     => ['2020-10-03 00:00:00', '2020-11-03 23:59:59'],
+        'compare'   => 'BETWEEN',
+        'type'      => 'DATETIME',
+      ],
+      [
+        // start filter is BETWEEN event.start AND event.end/event.until
+        'relation'  => 'AND',
+        [
+          // event.start <= start filter
+          'key'     => 'start',
+          'value'   => '2020-10-03 00:00:00',
+          'compare' => '<=',
+          'type'    => 'DATETIME',
+        ],
+        [
+          // event.end/event.until > start filter
+          'key'     => ['end', 'until'],
+          'value'   => '2020-10-03 00:00:00',
+          'compare' => '>',
+          'type'    => 'DATETIME',
+        ],
+      ],
+      [
+        'key'       => ['end', 'until'],
+        'value'     => ['2020-10-03 00:00:00', '2020-11-03 23:59:59'],
+        'compare'   => 'BETWEEN',
+        'type'      => 'DATETIME',
+      ],
     ], $query->params()['meta_query'][0]);
-    $this->assertEquals([
-      'relation' => 'OR',
-      // Include events up to the end of the current month
-      [
-        'key'     => 'end',
-        'value'   => '2020-11-03 23:59:59',
-        'compare' => '<=',
-        'type'    => 'DATETIME',
-      ],
-      [
-        'key'     => 'until',
-        'value'   => '2020-11-03 23:59:59',
-        'compare' => '<=',
-        'type'    => 'DATETIME',
-      ],
-    ], $query->params()['meta_query'][1]);
   }
 
   public function test_params_event_category_slug() {
@@ -288,5 +354,53 @@ class EventQueryTest extends BaseTest {
         'field'    => 'slug',
       ],
     ], $query->params()['tax_query']);
+  }
+
+  public function test_recurrence_constraints_default() {
+    $query = new EventQuery([
+      'current_time'   => '2020-04-20 16:20:00',
+    ]);
+
+    $this->assertEquals([
+      'earliest' => '2020-04-01 00:00:00',
+      'latest'   => '2020-04-30 23:59:59',
+    ], $query->recurrence_constraints());
+  }
+
+  public function test_recurrence_constraints_truncating() {
+    $query = new EventQuery([
+      'current_time'           => '2020-04-20 16:20:00',
+      'truncate_current_month' => true,
+    ]);
+
+    $this->assertEquals([
+      'earliest' => '2020-04-20 00:00:00',
+      'latest'   => '2020-04-30 23:59:59',
+    ], $query->recurrence_constraints());
+  }
+
+  public function test_recurrence_constraints_event_month() {
+    $query = new EventQuery([
+      'current_time'           => '2020-04-20 16:20:00',
+      'event_month'            => '2020-04',
+    ]);
+
+    $this->assertEquals([
+      'earliest' => '2020-04-01 00:00:00',
+      'latest'   => '2020-04-30 23:59:59',
+    ], $query->recurrence_constraints());
+  }
+
+  public function test_recurrence_constraints_end_date() {
+    $query = new EventQuery([
+      'current_time' => '2020-04-01 16:20:00',
+      'start_date'   => '2020-04-20 00:00:00',
+      'end_date'     => '2020-05-20 23:59:59',
+    ]);
+
+    $this->assertEquals([
+      'earliest' => '2020-04-20 00:00:00',
+      'latest'   => '2020-05-20 23:59:59',
+    ], $query->recurrence_constraints());
   }
 }

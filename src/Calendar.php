@@ -13,12 +13,16 @@ use DateTime;
 use DateTimeInterface;
 use DateTimeImmutable;
 use DateInterval;
+use InvalidArgumentException;
 use RRule\RRule;
 use RRule\RSet;
 
 /**
  * Calendar class for parsing/translating recurrence rules to
- * individual recurrence instances
+ * individual recurrence instances.
+ *
+ * NOTE: Calendar is not responsible for querying events, only for translating
+ * their recurrence rules into separate instances.
  */
 class Calendar {
   /**
@@ -49,10 +53,30 @@ class Calendar {
   /**
    * Get an array of events, parsed out into individual recurrences
    *
+   * @param array $opts optional additional constraints to place on the recurrences,
+   * for example if querying by event_month when multi-month recurring events
+   * show up in the query results. Supported options:
+   * * earliest: date string
+   * * latest: date string
+   * * event_month: shorthand for: [
+   *     'earliest' => (first of month),
+   *     'latest'   => (last of month),
+   *   ]
    * @return array
    */
-  public function recurrences() : array {
-    return array_reduce($this->events, [$this, 'aggregate_recurrences'], []);
+  public function recurrences(array $opts = []) : array {
+    $reducer = function(array $recurrences, array $event) use ($opts) : array {
+      return $this->aggregate_recurrences($recurrences, $event, $opts);
+    };
+
+    $recurrences = array_reduce($this->events, $reducer, []);
+
+    // sort by start date
+    usort($recurrences, function(array $a, array $b) : int {
+      return strcmp($a['start'], $b['start']);
+    });
+
+    return $recurrences;
   }
 
   /**
@@ -61,9 +85,15 @@ class Calendar {
    *
    * @param array $recurrences recurrences we've already collected
    * @param array $event the event series data to parse out and add
+   * @param array $constraints extra constraints that each event should
+   * fulfill to be included in the final aggregate
    * @return array the aggregated recurrence data
    */
-  protected function aggregate_recurrences(array $recurrences, array $event) : array {
+  protected function aggregate_recurrences(
+    array $recurrences,
+    array $event,
+    array $constraints
+  ) : array {
     if (empty($event['recurrence'])) {
       // no recurrence rules to parse; just add this event
       // to the aggregate and return
@@ -71,14 +101,12 @@ class Calendar {
       return $recurrences;
     }
 
-    // TODO parse out start/end once at beginning
-
     $rules = $event['recurrence'];
     $rset  = new RSet();
     $rrule = new RRule([
-      'DTSTART' => $event['start'],
+      'DTSTART' => $this->rrule_start($event, $constraints),
       'FREQ'    => strtoupper($rules['frequency']),
-      'UNTIL'   => $rules['until'],
+      'UNTIL'   => $this->rrule_until($event, $constraints),
     ]);
     $rset->addRRule($rrule);
 
@@ -106,12 +134,50 @@ class Calendar {
       ]);
     }
 
-    // sort by start date
-    usort($recurrences, function(array $a, array $b) : int {
-      return strcmp($a['start'], $b['start']);
-    });
-
     return $recurrences;
+  }
+
+  /**
+   * Given a recurring event and query constraints, return the actual
+   * DTSTART RRULE param to use in recurrence expansion.
+   *
+   * @internal
+   */
+  protected function rrule_start(array $event, array $constraints) : string {
+    $earliest = $constraints['earliest'] ?? '';
+
+    if ($earliest && $earliest > $event['start']) {
+      $start    = date_create_immutable($event['start']);
+      $earliest = date_create_immutable($earliest);
+
+      return ($start && $earliest)
+        ? $earliest->format('Y-m-d ') . $start->format('H:i:s')
+        : $event['start']; // something weird happened
+    }
+
+    return $event['start'];
+  }
+
+  /**
+   * Given a recurring event and query constraints, return the actual
+   * UNTIL RRULE param to use in recurrence expansion.
+   *
+   * @internal
+   */
+  protected function rrule_until(array $event, array $constraints) : string {
+    $rules  = $event['recurrence'];
+    $latest = $constraints['latest'] ?? '';
+
+    if ($latest && $latest < $rules['until']) {
+      $until  = date_create_immutable($rules['until']);
+      $latest = date_create_immutable($latest);
+
+      return ($until && $latest)
+        ? $latest->format('Y-m-d ') . $until->format('H:i:s')
+        : $rules['until']; // something weird happened
+    }
+
+    return $rules['until'];
   }
 
   /**

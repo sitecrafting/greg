@@ -189,45 +189,71 @@ class EventQuery {
    * @internal
    */
   protected function meta_clause() : array {
+    // TODO do we still need this check?
     if (empty($this->start_date()) && empty($this->end_date())) {
       return [];
     }
 
-    $meta = [
-      'relation' => 'AND',
+    $start_filter = $this->start_date();
+    $end_filter   = $this->end_date();
+
+    $date_query = [
+      'relation' => 'OR',
     ];
 
-    $start = $this->start_date();
-    if ($start) {
-      $meta[] = [
+    if ($start_filter) {
+      // event.start BETWEEN start/end filters
+      $date_query[] = [
         'key'     => $this->meta_keys['start'],
-        'value'   => $start,
-        'compare' => '>=',
+        'value'   => [$start_filter, $end_filter],
+        'compare' => 'BETWEEN',
+        'type'    => 'DATETIME',
+      ];
+
+      // start filter BETWEEN event.start AND event.end
+      $date_query[] = [
+        'relation' => 'AND',
+        [
+          // event starts BEFORE start_filter
+          'key'     => $this->meta_keys['start'],
+          'value'   => $start_filter,
+          'compare' => '<=',
+          'type'    => 'DATETIME',
+        ],
+        [
+          // event ends AFTER start_filter
+          'key'     => [$this->meta_keys['end'], $this->meta_keys['until']],
+          'value'   => $start_filter,
+          'compare' => '>',
+          'type'    => 'DATETIME',
+        ],
+      ];
+    }
+
+    if ($end_filter) {
+      // event.end/event.until BETWEEN start/end filters
+      $date_query[] = [
+        'key'     => [$this->meta_keys['end'], $this->meta_keys['until']],
+        'value'   => [$start_filter, $end_filter],
+        'compare' => 'BETWEEN',
         'type'    => 'DATETIME',
       ];
     }
 
-    $end = $this->end_date();
-    if ($end) {
-      $meta[] = [
-        'relation' => 'OR',
-        [
-          'key'     => $this->meta_keys['end'],
-          'value'   => $end,
-          'compare' => '<=',
-          'type'    => 'DATETIME',
-        ],
-        [
-          'key'     => $this->meta_keys['until'],
-          'value'   => $end,
-          'compare' => '<=',
-          'type'    => 'DATETIME',
-        ],
-      ];
-    }
-
     return [
-      'meta_query' => $meta,
+      'meta_query' => [$date_query],
+    ];
+  }
+
+  /**
+   * Constraints to pass to Calendar::recurrences()
+   *
+   * @internal
+   */
+  public function recurrence_constraints() : array {
+    return [
+      'earliest'    => $this->start_date(),
+      'latest'      => $this->end_date(),
     ];
   }
 
@@ -236,7 +262,7 @@ class EventQuery {
    *
    * @internal
    */
-  protected function start_date() : string {
+  public function start_date() : string {
     if (!empty($this->params['start_date'])) {
       // User passed explicit start_date; honor precisely.
       return $this->start_date->format('Y-m-d 00:00:00');
@@ -254,7 +280,7 @@ class EventQuery {
    *
    * @internal
    */
-  protected function end_date() : string {
+  public function end_date() : string {
     if ($this->end_date) {
       return $this->end_date->format('Y-m-d 23:59:59');
     }

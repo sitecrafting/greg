@@ -36,7 +36,7 @@ class GregTest extends IntegrationTest {
       'post_title' => 'My Old Event',
       'meta_input' => [
         'start'    => date_create_immutable('now')->modify('-6 weeks')->format('Y-m-d 00:00:00'),
-        'end'      => date_create_immutable('now')->modify('+5 weeks')->format('Y-m-d 00:00:00'),
+        'end'      => date_create_immutable('now')->modify('-5 weeks')->format('Y-m-d 00:00:00'),
       ],
     ]);
     $this->factory->post->create([
@@ -56,12 +56,14 @@ class GregTest extends IntegrationTest {
       'post_type'  => 'greg_event',
       'post_title' => 'My Single Event',
       'meta_input' => [
-        'start'    => date_create_immutable('now')->modify('+24 hours')->format('Y-m-d 00:00:00'),
-        'end'      => date_create_immutable('now')->modify('+27 hours')->format('Y-m-d 00:00:00'),
+        'start'    => '2020-03-03 09:00:00',
+        'end'      => '2020-03-04 09:00:00',
       ],
     ]);
 
-    $events = Greg\get_events();
+    $events = Greg\get_events([
+      'current_time' => '2020-03-01',
+    ]);
 
     $this->assertCount(1, $events);
     $this->assertInstanceOf(Event::class, $events[0]);
@@ -69,24 +71,22 @@ class GregTest extends IntegrationTest {
   }
 
   public function test_get_events_with_recurrences() {
-    $start = date_create_immutable('now')->modify('+24 hours');
-    $end   = $start->modify('+25 hours');
-    $until = $start->modify('+1 week');
-
     $this->factory->post->create([
       'post_type'   => 'greg_event',
       'post_title'  => 'My Recurring Event',
       'meta_input'  => [
-        'start'     => $start->format('Y-m-d 00:00:00'),
-        'end'       => $end->format('Y-m-d 00:00:00'),
+        'start'     => '2020-10-11 10:00:00',
+        'end'       => '2020-10-12 11:00:00',
         'frequency' => 'DAILY',
-        'until'     => $until->format('Y-m-d 00:00:00'),
+        'until'     => '2020-10-17 10:00:00',
       ],
     ]);
 
-    $events = Greg\get_events();
+    $events = Greg\get_events([
+      'current_time' => '2020-10-10',
+    ]);
 
-    $this->assertCount(8, $events);
+    $this->assertCount(7, $events);
     foreach ($events as $event) {
       $this->assertInstanceOf(Event::class, $event);
       $this->assertEquals('My Recurring Event', $event->title());
@@ -94,27 +94,23 @@ class GregTest extends IntegrationTest {
   }
 
   public function test_get_events_with_recurrences_and_exceptions() {
-    $start   = date_create_immutable('now')->modify('+24 hours');
-    $end     = $start->modify('+25 hours');
-    $until   = $start->modify('+1 week');
-    $except1 = $start->modify('+48 hours');
-    $except2 = $start->modify('+120 hours');
-
     $this->factory->post->create([
       'post_type'    => 'greg_event',
       'post_title'   => 'My Recurring Event',
       'meta_input'   => [
-        'start'      => $start->format('Y-m-d 00:00:00'),
-        'end'        => $end->format('Y-m-d 00:00:00'),
+        'start'      => '2020-10-11 10:00:00',
+        'end'        => '2020-10-12 11:00:00',
         'frequency'  => 'DAILY',
-        'until'      => $until->format('Y-m-d 00:00:00'),
-        'exceptions' => [$except1->format('Y-m-d 00:00:00'), $except2->format('Y-m-d 00:00:00')],
+        'until'      => '2020-10-17 10:00:00',
+        'exceptions' => ['2020-10-13 10:00:00', '2020-10-16 10:00:00'],
       ],
     ]);
 
-    $events = Greg\get_events();
+    $events = Greg\get_events([
+      'current_time' => '2020-10-02',
+    ]);
 
-    $this->assertCount(6, $events);
+    $this->assertCount(5, $events);
     foreach ($events as $event) {
       $this->assertInstanceOf(Event::class, $event);
       $this->assertEquals('My Recurring Event', $event->title());
@@ -122,27 +118,166 @@ class GregTest extends IntegrationTest {
   }
 
   public function test_get_events_skip_expansion() {
-    $start = date_create_immutable('now')->modify('+24 hours');
-    $end   = $start->modify('+25 hours');
-    $until = $start->modify('+1 week');
-
     $this->factory->post->create([
       'post_type'   => 'greg_event',
       'post_title'  => 'My Event Series',
       'meta_input'  => [
-        'start'     => $start->format('Y-m-d 00:00:00'),
-        'end'       => $end->format('Y-m-d 00:00:00'),
+        'start'     => '2020-09-05 14:00:00',
+        'end'       => '2020-09-05 16:30:00',
         'frequency' => 'DAILY',
-        'until'     => $until->format('Y-m-d 00:00:00'),
+        'until'     => '2020-09-11 14:00:00',
       ],
     ]);
 
     $events = Greg\get_events([
       'expand_recurrences' => false,
+      'current_time'       => '2020-09',
     ]);
 
     $this->assertCount(1, $events);
     $this->assertInstanceOf(Event::class, $events[0]);
     $this->assertEquals('My Event Series', $events[0]->title());
+  }
+
+  public function test_get_events_mixed() {
+    $event_data = [
+      [
+        'post_type'                => 'greg_event',
+        'post_title'               => 'Costume Party!',
+        'post_date'                => '2020-10-21 00:00:00',
+        'meta_input'               => [
+          'start'                  => '2020-10-31 21:00:00',
+          'end'                    => '2020-10-31 23:30:00',
+          'recurrence_description' => '',
+        ],
+      ],
+      [
+        'post_type'                => 'greg_event',
+        'post_title'               => 'Party Planning',
+        'post_date'                => '2020-10-22 00:00:00',
+        'meta_input'               => [
+          'start'                  => '2020-10-29 11:00:00',
+          'end'                    => '2020-10-29 12:00:00',
+          'recurrence_description' => '',
+        ],
+      ],
+      [
+        'post_type'                => 'greg_event',
+        'post_title'               => 'Recurring Event',
+        'post_date'                => '2020-10-23 00:00:00',
+        'meta_input'               => [
+          'start'                  => '2020-10-28 12:00:00',
+          'end'                    => '2020-10-28 12:30:00',
+          'until'                  => '2020-11-02 12:00:00',
+          'frequency'              => 'daily',
+          'exceptions'             => [],
+          'recurrence_description' => 'Daily from the 28th thru Nov. 2nd',
+        ],
+      ],
+    ];
+
+    foreach ($event_data as $data) {
+      $this->factory->post->create($data);
+    }
+
+    $events = Greg\get_events([
+      'event_month'  => '2020-10',
+      'current_time' => '2020-10-25 00:00:00',
+    ]);
+
+    $summary = array_map(function(Event $recurrence) : string {
+      return $recurrence->title() . ' ' . $recurrence->start('m/j g:i');
+    }, $events);
+
+    $this->assertEquals([
+      'Recurring Event 10/28 12:00',
+      'Party Planning 10/29 11:00',
+      'Recurring Event 10/29 12:00',
+      'Recurring Event 10/30 12:00',
+      'Recurring Event 10/31 12:00',
+      'Costume Party! 10/31 9:00',
+    ], $summary);
+  }
+
+  /**
+   * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
+   */
+  public function test_get_events_limit_earliest() {
+    // multiple events, with the first one recurring
+    $this->factory->post->create([
+      'post_title'   => 'Recurring Event',
+      'post_type'    => 'greg_event',
+      'meta_input'   => [
+        'start'      => '2020-09-25 12:00:00',
+        'end'        => '2020-09-25 12:30:00',
+        'until'      => '2020-11-15 12:00:00',
+        'frequency'  => 'daily',
+        'exceptions' => [],
+      ],
+    ]);
+
+    $recurrences = Greg\get_events([
+      'start_date'   => '2020-10-01',
+      'end_date'     => '2020-12-31',
+      'current_time' => '2020-10-01',
+    ]);
+
+    // 31 in Oct, 15 in Nov
+    $this->assertCount(31 + 15, $recurrences);
+    $this->assertEquals('2020-10-01', $recurrences[0]->start('Y-m-d'));
+    $this->assertEquals('2020-11-15', $recurrences[45]->start('Y-m-d'));
+  }
+
+  /**
+   * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
+   */
+  public function test_get_events_limit_latest() {
+    $this->factory->post->create([
+      'post_title'   => 'Recurring Event',
+      'post_type'    => 'greg_event',
+      'meta_input'   => [
+        'start'      => '2020-09-25 12:00:00',
+        'end'        => '2020-09-25 12:30:00',
+        'until'      => '2020-11-15 12:00:00',
+        'frequency'  => 'daily',
+        'exceptions' => [],
+      ],
+    ]);
+
+    $recurrences = Greg\get_events([
+      'current_time' => '2020-10-01',
+      // start_date defaults to current_time
+      'end_date'     => '2020-10-31',
+    ]);
+
+    $this->assertCount(31, $recurrences);
+    $this->assertEquals('2020-10-01', $recurrences[0]->start('Y-m-d'));
+    $this->assertEquals('2020-10-31', $recurrences[30]->start('Y-m-d'));
+  }
+
+  /**
+   * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
+   */
+  public function test_get_events_limit_event_month() {
+    $this->factory->post->create([
+      'post_title'   => 'Recurring Event',
+      'post_type'    => 'greg_event',
+      'meta_input'   => [
+        'start'      => '2020-09-25 12:00:00',
+        'end'        => '2020-09-25 12:30:00',
+        'until'      => '2020-11-15 12:00:00',
+        'frequency'  => 'daily',
+        'exceptions' => [],
+      ],
+    ]);
+
+    $recurrences = Greg\get_events([
+      'event_month'  => '2020-10',
+      'current_time' => '2020-10-01',
+    ]);
+
+    $this->assertCount(31, $recurrences);
+    $this->assertEquals('2020-10-01', $recurrences[0]->start('Y-m-d'));
+    $this->assertEquals('2020-10-31', $recurrences[30]->start('Y-m-d'));
   }
 }
