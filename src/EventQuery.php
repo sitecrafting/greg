@@ -252,8 +252,8 @@ class EventQuery {
    */
   public function recurrence_constraints() : array {
     return [
-      'earliest'    => $this->start_date(),
-      'latest'      => $this->end_date(),
+      'earliest' => $this->start_date(),
+      'latest'   => $this->end_date(),
     ];
   }
 

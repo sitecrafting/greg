@@ -381,8 +381,8 @@ class EventQueryTest extends BaseTest {
 
   public function test_recurrence_constraints_event_month() {
     $query = new EventQuery([
-      'current_time'           => '2020-04-20 16:20:00',
-      'event_month'            => '2020-04',
+      'current_time' => '2020-04-20 16:20:00',
+      'event_month'  => '2020-04',
     ]);
 
     $this->assertEquals([
