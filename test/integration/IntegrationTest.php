@@ -21,6 +21,8 @@ abstract class IntegrationTest extends WP_UnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->setup_default_meta_keys();
+    register_post_type('greg_event');
+    register_taxonomy('greg_event_category', ['greg_event']);
   }
 
   protected function setup_default_meta_keys() {
