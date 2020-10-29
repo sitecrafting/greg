@@ -254,7 +254,6 @@ class EventQuery {
     return [
       'earliest'    => $this->start_date(),
       'latest'      => $this->end_date(),
-      'event_month' => $this->params['event_month'] ?? '',
     ];
   }
 

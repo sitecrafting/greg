@@ -355,4 +355,52 @@ class EventQueryTest extends BaseTest {
       ],
     ], $query->params()['tax_query']);
   }
+
+  public function test_recurrence_constraints_default() {
+    $query = new EventQuery([
+      'current_time'   => '2020-04-20 16:20:00',
+    ]);
+
+    $this->assertEquals([
+      'earliest' => '2020-04-01 00:00:00',
+      'latest'   => '2020-04-30 23:59:59',
+    ], $query->recurrence_constraints());
+  }
+
+  public function test_recurrence_constraints_truncating() {
+    $query = new EventQuery([
+      'current_time'           => '2020-04-20 16:20:00',
+      'truncate_current_month' => true,
+    ]);
+
+    $this->assertEquals([
+      'earliest' => '2020-04-20 00:00:00',
+      'latest'   => '2020-04-30 23:59:59',
+    ], $query->recurrence_constraints());
+  }
+
+  public function test_recurrence_constraints_event_month() {
+    $query = new EventQuery([
+      'current_time'           => '2020-04-20 16:20:00',
+      'event_month'            => '2020-04',
+    ]);
+
+    $this->assertEquals([
+      'earliest' => '2020-04-01 00:00:00',
+      'latest'   => '2020-04-30 23:59:59',
+    ], $query->recurrence_constraints());
+  }
+
+  public function test_recurrence_constraints_end_date() {
+    $query = new EventQuery([
+      'current_time' => '2020-04-01 16:20:00',
+      'start_date'   => '2020-04-20 00:00:00',
+      'end_date'     => '2020-05-20 23:59:59',
+    ]);
+
+    $this->assertEquals([
+      'earliest' => '2020-04-20 00:00:00',
+      'latest'   => '2020-05-20 23:59:59',
+    ], $query->recurrence_constraints());
+  }
 }
