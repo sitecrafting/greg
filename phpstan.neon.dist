@@ -13,3 +13,4 @@ parameters:
     - '#^Call to static method success\(\) on an unknown class WP_CLI\.$#'
     # We can't have strong typehints without union types :(
     - '#has no return typehint specified\.#'
+    - '#^Parameter \#1 \$term of static method Timber\\Timber::get_term\(\) expects int\|WP_Term\|null, array\|WP_Term given\.$#'

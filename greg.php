@@ -178,6 +178,10 @@ add_filter('timber/twig', function(Environment $twig) {
   $twig->addFunction(new TwigFunction('greg_compile', Greg\compile::class));
   $twig->addFunction(new TwigFunction('greg_render', Greg\render::class));
   $twig->addFunction(new TwigFunction('greg_get_events', Greg\get_events::class));
+  $twig->addFunction(new TwigFunction('greg_event_month', Greg\event_month::class));
+  $twig->addFunction(new TwigFunction('greg_prev_month', Greg\prev_month::class));
+  $twig->addFunction(new TwigFunction('greg_next_month', Greg\next_month::class));
+  $twig->addFunction(new TwigFunction('greg_event_category', Greg\event_category::class));
 
   return $twig;
 });

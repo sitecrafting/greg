@@ -203,3 +203,27 @@ function next_month(string $format = 'Y-m') : string {
 function month_datetime() {
   return date_create_immutable(get_query_var('event_month') ?: 'now');
 }
+
+/**
+ * Get the current Event Category term, if any.
+ *
+ * @return \Timber\Term|false the current Term according to the global WP_Query
+ * or the event_category query var, otherwise false.
+ */
+function event_category() {
+  $ident = get_query_var('event_category') ?: null;
+
+  if (!$ident) {
+    // Return the current term, if there is one.
+    return Timber::get_term();
+  }
+
+  $field   = is_int($ident) ? 'id' : 'slug';
+  $wp_term = get_term_by($field, $ident, 'greg_event_category');
+
+  if (!$wp_term) {
+    return false;
+  }
+
+  return Timber::get_term($wp_term);
+}

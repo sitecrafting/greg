@@ -378,4 +378,35 @@ class GregTest extends IntegrationTest {
     set_query_var('event_month', 'NOT THIS GARBAGE AGAIN');
     $this->assertEquals('', Greg\next_month());
   }
+
+  public function test_event_category_via_query_var_slug() {
+    $id = $this->factory->term->create([
+      'taxonomy' => 'greg_event_category',
+      'name'     => 'Test Cat',
+    ]);
+
+    set_query_var('event_category', 'test-cat');
+    $term = Greg\event_category();
+
+    $this->assertEquals($id, Greg\event_category()->id);
+    $this->assertEquals('Test Cat', Greg\event_category()->name);
+  }
+
+  public function test_event_category_via_query_var_id() {
+    $id = $this->factory->term->create([
+      'taxonomy' => 'greg_event_category',
+      'name'     => 'Test Cat',
+    ]);
+
+    set_query_var('event_category', $id);
+    $term = Greg\event_category();
+
+    $this->assertEquals($id, Greg\event_category()->id);
+    $this->assertEquals('Test Cat', Greg\event_category()->name);
+  }
+
+  public function test_event_category_garbage() {
+    set_query_var('event_category', 'NOT THIS GARBAGE AGAIN');
+    $this->assertFalse(Greg\event_category());
+  }
 }
