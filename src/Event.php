@@ -137,9 +137,11 @@ class Event implements CoreInterface {
    * non-recurring Events. For recurring Events, always ensure you pass
    * start/end options specific to each recurrence.
    *
-   * @internal
+   * @api
+   * @param \Timber\Post $post a Post object, presumably of type `greg_event`.
+   * @return self
    */
-  public static function from_post(Post $post) {
+  public static function from_post(Post $post) : self {
     return new self($post);
   }
 
