@@ -76,6 +76,9 @@ function main() {
 
   # archive plugins distro files inside a top-level greg/ dir
   tar -cvzf "$tar_name" \
+    --exclude='*.swp' \
+    --exclude='*.swn' \
+    --exclude='*.swo' \
     greg/src/api.php \
     greg/greg.php \
     greg/src \
@@ -92,7 +95,10 @@ function main() {
     greg/vendor \
     greg/views \
     greg/LICENSE.txt \
-    greg/README.md
+    greg/README.md \
+    --exclude '*.swp' \
+    --exclude '*.swn' \
+    --exclude '*.swo'
 
   # remove hackish symlink
   rm ./greg

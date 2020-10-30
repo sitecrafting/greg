@@ -11,6 +11,9 @@
 # build artifacts
 /greg-*.tar.gz
 /greg-*.zip
+# The folder we zip/tar into; this should be removed automatically,
+# this is just in case the build script fails.
+/greg/
 
 # cypress test artifacts
 /cypress/videos
