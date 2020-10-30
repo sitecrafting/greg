@@ -11,8 +11,9 @@ A de-coupled calendar solution for WordPress and Timber. Leverage [RRULE](https:
 ## Contents
 
 * [Rationale](#rationale)
-* [Installation](#installation)
 * [Requirements](#requirements)
+* [Installation](#installation)
+* [Quick Start](#quick-start)
 * [Basic Usage](#basic-usage)
 * [Actions & Filters](#actions--filters)
 * [Command Line Interface](#command-line-interface-cli)
@@ -37,8 +38,16 @@ Let's get one thing out of the way: Greg is **not** a drop-in replacement for Th
 ### Do NOT use Greg if:
 
 * You want a plug-n-play event management system that renders your event calendar/listing/detail pages for you
+
 * You want a WP Admin page with tons of settings you can control without code updates
+
 * You want a standalone solution (not reliant on Timber)
+
+## Requirements
+
+  * PHP >= 7.4
+  * WordPress Core >= 5.5.1
+  * [Timber >= 2.0](https://timber.github.io/docs/v2/)
 
 ## Installation
 
@@ -58,11 +67,47 @@ composer require sitecrafting/greg
 
 Greg is PSR-4 compliant, so assuming you've required your `vendor/autoload.php` as you normally would, you can `use Greg\*` classes from anywhere.
 
-## Requirements
+## Quick Start
 
-* PHP >= 7.4
-* WordPress Core >= 5.5.1
-* Timber >= 2.0
+```php
+/* archive-greg_event.php */
+
+use Timber\Timber;
+
+$data = Timber::context();
+
+$data['events'] = Greg\get_events();
+
+Timber::render('archive-greg_event.twig', $data);
+```
+
+```twig
+{# views/archive-greg_event.twig #}
+{% extends 'layouts/my-main-layout.twig' %}
+
+{% block main_content %}
+  <main class="event-listing">
+    <h1>Events </h1>
+
+    {% for event in events %}
+      <article>
+        <h2><a href="{{ event.link }}">{{ event.title }}</a></h2>
+        {# October 31, 11:10 am - 1:30 pm #}
+        <h3>{{ event.range('F j, g:ia', 'g:ia') }}</h2>
+        <section>{{ event.content }}</section>
+      </article>
+    {% endfor %}
+
+    <div class="pagination">
+      <a href="?event_month={{ greg_prev_month() }}">{{ greg_prev_month('F') }} Events</a>
+      <a href="?event_month={{ greg_next_month() }}">{{ greg_next_month('F') }} Events</a>
+    </div>
+
+  </main>
+{% endblock %}
+```
+
+**TODO:** add quick start guide for category archives and event details
 
 ## Basic Usage
 
