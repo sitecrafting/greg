@@ -10,11 +10,7 @@
 
 #### Impact
 
-<!-- What impact will this have on Conifer's architecture? performace? backwards compatibilty? etc. -->
-
-#### Usage Changes
-
-<!-- Are there are any usage changes that we (or, importantly, other Conifer users) need to know about? Please list them here so that we can include those details in the notes for the next release. -->
+<!-- Are there are any usage changes that we (or, more importantly, other Greg users) need to know about? What impact will this have on Greg's architecture? performace? backwards compatibilty? etc. -->
 
 #### Considerations
 
@@ -22,4 +18,4 @@
 
 #### Testing
 
-<!-- First, do your changes pass unit tests and coding standards (`lando unit` and `lando sniff`)? Second, are unit tests included? If not, please provide pseudo code for a scenario that fails without your code, but succeeds with it. NOTE: we *strongly* encourage you to include unit tests with your code. -->
+<!-- First, do your changes pass unit tests, static analysis checks, and coding standards (`lando ci`)? Second, are unit tests included? If not, please provide pseudo code for a scenario that fails without your code, but succeeds with it. NOTE: we *strongly* encourage you to include unit and/or integration tests with your code. -->
