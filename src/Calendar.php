@@ -110,16 +110,8 @@ class Calendar {
     ]);
     $rset->addRRule($rrule);
 
-    foreach (($rules['exceptions'] ?? []) as $row) {
-      // Handle special case where exception date is nested one level deep,
-      // as in ACF.
-      if (is_array($row)) {
-        foreach ($row as $exdate) {
-          $rset->addExDate($exdate);
-        }
-      } else {
-        $rset->addExDate($row);
-      }
+    foreach ($this->normalize_exceptions($event) as $exception) {
+      $rset->addExDate($exception);
     }
 
     $duration = $this->duration($event['start'], $event['end']);
@@ -231,5 +223,24 @@ class Calendar {
         return $date->format($this->options['human_readable_format'] ?? 'M j, Y');
       },
     ]);
+  }
+
+  /**
+   * Normalize exceptions dates, dealing with nested arrays and mismatched
+   * times.
+   *
+   * @param array $event a single recurring event array
+   * @return Array<string> an array of exception dates as strings
+   */
+  protected function normalize_exceptions(array $event) : array {
+    $rules      = $event['recurrence'];
+    $exceptions = $rules['exceptions'] ?? [];
+
+    return array_reduce($exceptions, function($exceptions, $row) {
+      // Handle special case where exception date is nested one level deep,
+      // as in ACF.
+      $row_exceptions = is_array($row) ? array_values($row) : [$row];
+      return array_merge($exceptions, $row_exceptions);
+    }, []);
   }
 }
