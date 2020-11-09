@@ -410,4 +410,41 @@ class CalendarTest extends BaseTest {
     $this->assertEquals('2020-09-25 12:00:00', $recurrences[0]['start']);
     $this->assertEquals('2020-10-31 12:00:00', $recurrences[36]['start']);
   }
+
+  /**
+   * Test exceptions ACF issue: https://github.com/sitecrafting/greg/issues/7
+   */
+  public function test_recurrences_nested_exceptions() {
+    // multiple events, with the first one recurring
+    $events = [
+      [
+        'start'                  => '2020-09-25 12:00:00',
+        'end'                    => '2020-09-25 12:30:00',
+        'title'                  => 'Recurring Event',
+        'recurrence'             => [
+          'until'                => '2020-11-15 12:00:00',
+          'frequency'            => 'daily',
+          // This is how ACF returns repeater data
+          'exceptions'           => [
+            [
+              'exception'        => '2020-09-29 12:00:00',
+            ],
+            [
+              'exception'        => '2020-09-30 12:00:00',
+            ],
+          ],
+        ],
+        'recurrence_description' => 'Daily for a hecka long time',
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences([
+      'latest' => '2020-09-30 23:59:59',
+    ]);
+
+    // September events, minus two exceptions
+    $this->assertCount(6 - 2, $recurrences);
+  }
 }

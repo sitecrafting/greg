@@ -110,8 +110,16 @@ class Calendar {
     ]);
     $rset->addRRule($rrule);
 
-    foreach (($rules['exceptions'] ?? []) as $exdate) {
-      $rset->addExDate($exdate);
+    foreach (($rules['exceptions'] ?? []) as $row) {
+      // Handle special case where exception date is nested one level deep,
+      // as in ACF.
+      if (is_array($row)) {
+        foreach ($row as $exdate) {
+          $rset->addExDate($exdate);
+        }
+      } else {
+        $rset->addExDate($row);
+      }
     }
 
     $duration = $this->duration($event['start'], $event['end']);
