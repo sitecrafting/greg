@@ -66,6 +66,8 @@ function main() {
 
   backup_vendor
 
+  # remove any pre-existing release dir
+  rm -rf greg/
   tar_name="greg-${RELEASE}.tar.gz"
   zip_name="greg-${RELEASE}.zip"
   composer install --no-dev --prefer-dist
