@@ -119,11 +119,14 @@ use Timber\Timber;
 
 $data = Timber::context();
 
+// Wrap post in an Event object, so we get access to methods like range()
 $data['event'] = Event::from_post($data['post']);
+
+Timber::render('single-greg_event.twig', $data);
 ```
 
 ```twig
-{# views/archive-greg_event.twig #}
+{# views/archive-event.twig #}
 {% extends 'layouts/my-main-layout.twig' %}
 
 {% block main_content %}
