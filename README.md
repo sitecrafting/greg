@@ -69,6 +69,8 @@ Greg is PSR-4 compliant, so assuming you've required your `vendor/autoload.php` 
 
 ## Quick Start
 
+### Event Archive
+
 ```php
 /* archive-greg_event.php */
 
@@ -107,7 +109,92 @@ Timber::render('archive-greg_event.twig', $data);
 {% endblock %}
 ```
 
-**TODO:** add quick start guide for category archives and event details
+### Singular Event template
+
+```php
+/* single-greg_event.php */
+
+use Greg\Event;
+use Timber\Timber;
+
+$data = Timber::context();
+
+$data['event'] = Event::from_post($data['post']);
+```
+
+```twig
+{# views/archive-greg_event.twig #}
+{% extends 'layouts/my-main-layout.twig' %}
+
+{% block main_content %}
+  <main class="event-details">
+    <h1>{{ event.title }}</h1>{# post.title will also work #}
+    
+    {% if event.recurring() %}
+    	{# If no special human-written recurrence_description exists,
+    	   will default to something like "November 1st thru 10th at 9:30am" #}
+    	<h2>{{ event.recurrence_description
+    	    | default(
+    	    	event.recurrence_range('F jS', 'jS', ' thru ')
+    	    	~ ' at ' ~ event.start('g:ia')
+    	    ) }}</h2>
+    {% else %}
+    	{# i.e. "November 3rd 9:00am - 11:30am" #}
+    	<h2>{{ event.range('F jS g:ia', 'g:ia') }}
+    {% endif %}
+		
+		<div class="rtecontent">
+			{{ event.content }} {# post.content will also work #}
+		</div>
+
+  </main>
+{% endblock %}
+```
+
+### Event Category archive template
+
+```php
+/* archive-greg_event_category.php */
+
+use Timber\Timber;
+
+$data = Timber::context();
+
+// NOTE: get_events() knows when the main WP query is an Event Category query.
+$data['events'] = Greg\get_events();
+
+Timber::render('archive-greg_event_category.twig', $data);
+```
+
+```twig
+{# views/archive-greg_event_category.twig #}
+{% extends 'layouts/my-main-layout.twig' %}
+
+{% block main_content %}
+  <main class="event-listing">
+    <h1>Events </h1>
+
+		{# This part is the same as archive-greg_event_category.twig, above #}
+    {% for event in events %}
+      <article>
+        <h2><a href="{{ event.link }}">{{ event.title }}</a></h2>
+        {# October 31, 11:10 am - 1:30 pm #}
+        <h3>{{ event.range('F j, g:ia', 'g:ia') }}</h2>
+        <section>{{ event.content }}</section>
+      </article>
+    {% endfor %}
+
+		{# Persist any already-applied Event filters #}
+    <div class="pagination">
+      <a href="?event_month={{ greg_prev_month() }}&event_category={{ greg_event_category() }}"
+      >{{ greg_prev_month('F') }} Events</a>
+      <a href="?event_month={{ greg_next_month() }}&event_category={{ greg_event_category() }}"
+      >{{ greg_next_month('F') }} Events</a>
+    </div>
+
+  </main>
+{% endblock %}
+```
 
 ## Basic Usage
 
