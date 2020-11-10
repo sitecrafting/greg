@@ -200,6 +200,64 @@ class EventTest extends IntegrationTest {
     $this->assertEquals('11/5 1:30 - 3:00', $events[4]->range('m/j g:i', 'g:i'));
   }
 
+  public function test_recurrence_range_default() {
+    $current_time = '2020-10-31 22:00:00';
+
+    $start = '2020-11-01 13:30:00';
+    $end   = '2020-11-01 15:00:00';
+    $until = '2020-11-10 13:30:00';
+
+    $this->factory->post->create([
+      'post_type'                => 'greg_event',
+      'post_title'               => 'My Recurring Event',
+      'meta_input'               => [
+        'start'                  => $start,
+        'end'                    => $end,
+        'frequency'              => 'DAILY',
+        'until'                  => $until,
+        'exceptions'             => [],
+      ],
+    ]);
+
+    // Mock the current time; we want to compare resulting date strings exactly.
+    $event = Greg\get_events([
+      'current_time' => $current_time,
+    ])[0];
+
+    $this->assertEquals('November 1 - 10, 2020', $event->recurrence_range());
+  }
+
+  public function test_recurrence_range_formatted() {
+    $current_time = '2020-10-31 22:00:00';
+
+    $start = '2020-11-01 13:30:00';
+    $end   = '2020-11-01 15:00:00';
+    $until = '2020-11-10 13:30:00';
+
+    $this->factory->post->create([
+      'post_type'                => 'greg_event',
+      'post_title'               => 'My Recurring Event',
+      'meta_input'               => [
+        'start'                  => $start,
+        'end'                    => $end,
+        'frequency'              => 'DAILY',
+        'until'                  => $until,
+        'exceptions'             => [],
+      ],
+    ]);
+
+    // Mock the current time; we want to compare resulting date strings exactly.
+    $event = Greg\get_events([
+      'current_time' => $current_time,
+    ])[0];
+
+    $this->assertEquals('Nov 1st thru 10th', $event->recurrence_range(
+      'M jS',
+      'jS',
+      ' thru '
+    ));
+  }
+
   public function test_event_with_recurrences_and_exceptions() {
     $current_time = '2020-10-31 22:00:00';
 

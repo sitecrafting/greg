@@ -203,6 +203,24 @@ class Event implements CoreInterface {
 
 
   /**
+   * Start/Until date/time ranges
+   *
+   * @param string $start_format the format for displaying start date/time
+   * Default: "F j"
+   * @param string $until_format the format for displaying until date/time
+   * Default: "j, Y"
+   * @param string $separator the string to place between start and until
+   * @return string
+   */
+  public function recurrence_range(
+    string $start_format = 'F j',
+    string $until_format = 'j, Y',
+    string $separator = ' - '
+  ) : string {
+    return $this->start($start_format) . $separator . $this->until($until_format);
+  }
+
+  /**
    * Start/End date/time range
    *
    * @param string $start_format the format for displaying start date/time
