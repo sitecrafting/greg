@@ -283,8 +283,10 @@ class Calendar {
     // Keep as-is by default.
     [$exn_fmt, $start_fmt] = $alignments[strtoupper($freq)] ?? $alignments['SECONDLY'];
 
-    $exception_str = gmdate($exn_fmt, strtotime($dt));
-    $start_str     = gmdate($start_fmt, strtotime($start));
+    // Note: for parsing datetimes, we're failing over to 0 to avoid warnings.
+    // If we get an invalid date as a result, we'll filter it out later.
+    $exception_str = gmdate($exn_fmt, strtotime($dt) ?: 0);
+    $start_str     = gmdate($start_fmt, strtotime($start) ?: 0);
     return date_create_immutable($exception_str . $start_str);
   }
 }
