@@ -355,7 +355,6 @@ class CalendarTest extends BaseTest {
    * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
    */
   public function test_recurrences_limit_earliest() {
-    // multiple events, with the first one recurring
     $events = [
       [
         'start'                  => '2020-09-25 12:00:00',
@@ -385,7 +384,6 @@ class CalendarTest extends BaseTest {
    * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
    */
   public function test_recurrences_limit_latest() {
-    // multiple events, with the first one recurring
     $events = [
       [
         'start'                  => '2020-09-25 12:00:00',
@@ -415,7 +413,6 @@ class CalendarTest extends BaseTest {
    * Test exceptions ACF issue: https://github.com/sitecrafting/greg/issues/7
    */
   public function test_recurrences_nested_exceptions() {
-    // multiple events, with the first one recurring
     $events = [
       [
         'start'                  => '2020-09-25 12:00:00',
@@ -446,5 +443,216 @@ class CalendarTest extends BaseTest {
 
     // September events, minus two exceptions
     $this->assertCount(6 - 2, $recurrences);
+  }
+
+  /**
+   * Test exception format issue: https://github.com/sitecrafting/greg/issues/8
+   */
+  public function test_recurrences_exception_time_secondly() {
+    $events = [
+      [
+        'start'                  => '2020-09-25 12:00:00',
+        'end'                    => '2020-09-25 12:00:01',
+        'recurrence'             => [
+          'until'                => '2020-09-25 12:00:59',
+          'frequency'            => 'secondly',
+          'exceptions'           => [
+            // Calendar should completely ignore start time in parsing out
+            // exception times, since secondly is the finest granularity
+            // and doing so would break secondly exceptions.
+            '2020-09-25 12:00:05',
+            '2020-09-25 12:00:06',
+            '2020-09-25 12:00:07',
+          ],
+        ],
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences();
+
+    $this->assertCount(60 - 3, $recurrences);
+  }
+
+  /**
+   * Test exception format issue: https://github.com/sitecrafting/greg/issues/8
+   */
+  public function test_recurrences_exception_time_minutely() {
+    $events = [
+      [
+        'start'                  => '2020-09-25 12:00:00',
+        'end'                    => '2020-09-25 12:00:30',
+        'recurrence'             => [
+          'until'                => '2020-09-25 12:29:00',
+          'frequency'            => 'minutely',
+          'exceptions'           => [
+            // Calendar should normalize all of these to match start time
+            // seconds component, based on frequency = MINUTELY.
+            '2020-09-25 12:05:01',
+            '2020-09-25 12:06:02',
+            '2020-09-25 12:07:03',
+            '2020-09-25 12:08:04',
+            '2020-09-25 12:09:05',
+          ],
+        ],
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences();
+
+    $this->assertCount(30 - 5, $recurrences);
+  }
+
+  /**
+   * Test exception format issue: https://github.com/sitecrafting/greg/issues/8
+   */
+  public function test_recurrences_exception_time_hourly() {
+    $events = [
+      [
+        // Recur over ten hours, with four exceptions.
+        'start'                  => '2020-09-25 10:00:00',
+        'end'                    => '2020-09-25 10:30:00',
+        'recurrence'             => [
+          'until'                => '2020-09-25 19:00:00',
+          'frequency'            => 'hourly',
+          'exceptions'           => [
+            // Calendar should normalize all of these to match start time,
+            // based on frequency = DAILY.
+            '2020-09-25 12:00:00',
+            '2020-09-25 13:33:00',
+            '2020-09-25 14:12:34',
+            '2020-09-25 15:00:33',
+          ],
+        ],
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences();
+
+    $this->assertCount(10 - 4, $recurrences);
+  }
+
+  /**
+   * Test exception format issue: https://github.com/sitecrafting/greg/issues/8
+   */
+  public function test_recurrences_exception_time_daily() {
+    $events = [
+      [
+        'start'                  => '2020-09-25 12:00:00',
+        'end'                    => '2020-09-25 12:30:00',
+        'recurrence'             => [
+          'until'                => '2020-11-15 12:00:00',
+          'frequency'            => 'daily',
+          'exceptions'           => [
+            // Calendar should normalize all of these to match start time,
+            // based on frequency = DAILY.
+            '2020-09-26',
+            '2020-09-27 00:00:00',
+            '2020-09-28 00:00:00-08:00',
+          ],
+        ],
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences([
+      'latest' => '2020-09-30 23:59:59',
+    ]);
+
+    $this->assertCount(6 - 3, $recurrences);
+  }
+
+  /**
+   * Test exception format issue: https://github.com/sitecrafting/greg/issues/8
+   */
+  public function test_recurrences_exception_time_weekly() {
+    $events = [
+      [
+        // Six weekly recurrences with two exceptions.
+        'start'                  => '2020-09-01 12:00:00',
+        'end'                    => '2020-09-01 12:30:00',
+        'recurrence'             => [
+          'until'                => '2020-10-06 12:00:00',
+          'frequency'            => 'weekly',
+          'exceptions'           => [
+            // Calendar should normalize all of these to match start time,
+            // based on frequency = WEEKLY.
+            '2020-09-15',
+            '2020-09-22 00:00:00',
+          ],
+        ],
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences();
+
+    $this->assertCount(6 - 2, $recurrences);
+  }
+
+  /**
+   * Test exception format issue: https://github.com/sitecrafting/greg/issues/8
+   */
+  public function test_recurrences_exception_time_monthly() {
+    $events = [
+      [
+        // Twelve monthly occurrences, with three exceptions.
+        'start'                  => '2020-01-05 12:00:00',
+        'end'                    => '2020-01-05 12:30:00',
+        'recurrence'             => [
+          'until'                => '2020-12-05 12:00:00',
+          'frequency'            => 'monthly',
+          'exceptions'           => [
+            // Calendar should normalize all of these to match start time,
+            // based on frequency = MONTHLY.
+            '2020-04-20', // should align irrespective of day
+            '2020-07-05 23:59:59',
+            '2020-09-05 23:59:59',
+          ],
+        ],
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences();
+
+    $this->assertCount(12 - 3, $recurrences);
+  }
+
+  /**
+   * Test exception format issue: https://github.com/sitecrafting/greg/issues/8
+   */
+  public function test_recurrences_exception_time_yearly() {
+    $events = [
+      [
+        // Ten annual recurrences, with two exceptions.
+        'start'                  => '2018-09-25 12:00:00',
+        'end'                    => '2018-09-25 12:30:00',
+        'recurrence'             => [
+          'until'                => '2027-09-25 12:00:00',
+          'frequency'            => 'yearly',
+          'exceptions'           => [
+            // Calendar should normalize all of these to match start time,
+            // based on frequency = YEARLY.
+            '2020-09', // I just can't in 2020.
+            '2021-09-01', // Next year is borked as well.
+          ],
+        ],
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $recurrences = $calendar->recurrences();
+
+    $this->assertCount(10 -2, $recurrences);
   }
 }

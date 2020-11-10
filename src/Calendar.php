@@ -230,17 +230,61 @@ class Calendar {
    * times.
    *
    * @param array $event a single recurring event array
-   * @return Array<string> an array of exception dates as strings
+   * @return Array<DateTimeImmutable>
    */
   protected function normalize_exceptions(array $event) : array {
     $rules      = $event['recurrence'];
     $exceptions = $rules['exceptions'] ?? [];
 
-    return array_reduce($exceptions, function($exceptions, $row) {
+    $normalized = array_reduce($exceptions, function($exceptions, $row) {
       // Handle special case where exception date is nested one level deep,
       // as in ACF.
       $row_exceptions = is_array($row) ? array_values($row) : [$row];
       return array_merge($exceptions, $row_exceptions);
     }, []);
+
+    $aligned = array_map(function($exception) use ($event, $rules) {
+      return $this->align_time($exception, $event['start'], $rules['frequency']);
+    }, $normalized);
+
+    // Filter out empty values, which could have been returned by parsing a
+    // badly formatted date string.
+    return array_filter($aligned);
+  }
+
+  /**
+   * Align start time of datetime $dt to that of $start based on $freq,
+   * so RRULE can properly parse exception times.
+   *
+   * @param string $dt the dateime string to align
+   * @param string $start a datetime string to align to
+   * @param string $freq one of:
+   * - "SECONDLY"
+   * - "MINUTELY"
+   * - "HOURLY"
+   * - "DAILY"
+   * - "WEEKLY"
+   * - "MONTHLY"
+   * - "YEARLY"
+   * @return DateTimeImmutable|false
+   */
+  public function align_time(string $dt, string $start, string $freq) {
+    // Align time component to various granularities, based on $freq
+    $alignments = [
+      'SECONDLY' => ['Y-m-d H:i:s', ''], // keep $dt as-is
+      'MINUTELY' => ['Y-m-d H:i', ':s'], // align seconds
+      'HOURLY'   => ['Y-m-d H', ':i:s'], // align minutes
+      'DAILY'    => ['Y-m-d ', 'H:i:s'], // align hours
+      'WEEKLY'   => ['Y-m-d ', 'H:i:s'], // align hours
+      'MONTHLY'  => ['Y-m', '-d H:i:s'], // align day
+      'YEARLY'   => ['Y', '-m-d H:i:s'], // align month
+    ];
+
+    // Keep as-is by default.
+    [$exn_fmt, $start_fmt] = $alignments[strtoupper($freq)] ?? $alignments['SECONDLY'];
+
+    $exception_str = gmdate($exn_fmt, strtotime($dt));
+    $start_str     = gmdate($start_fmt, strtotime($start));
+    return date_create_immutable($exception_str . $start_str);
   }
 }
