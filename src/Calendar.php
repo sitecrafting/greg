@@ -243,6 +243,9 @@ class Calendar {
       return array_merge($exceptions, $row_exceptions);
     }, []);
 
+    // Align each exception time component to that of start, at the appropriate
+    // granularity based on frequencty, so that RRULE can properly parse
+    // exception times.
     $aligned = array_map(function($exception) use ($event, $rules) {
       return $this->align_time($exception, $event['start'], $rules['frequency']);
     }, $normalized);
@@ -253,8 +256,7 @@ class Calendar {
   }
 
   /**
-   * Align start time of datetime $dt to that of $start based on $freq,
-   * so RRULE can properly parse exception times.
+   * Align start time of datetime $dt to that of $start based on $freq.
    *
    * @param string $dt the dateime string to align
    * @param string $start a datetime string to align to
@@ -281,12 +283,12 @@ class Calendar {
     ];
 
     // Keep as-is by default.
-    [$exn_fmt, $start_fmt] = $alignments[strtoupper($freq)] ?? $alignments['SECONDLY'];
+    [$dt_fmt, $start_fmt] = $alignments[strtoupper($freq)] ?? $alignments['SECONDLY'];
 
     // Note: for parsing datetimes, we're failing over to 0 to avoid warnings.
     // If we get an invalid date as a result, we'll filter it out later.
-    $exception_str = gmdate($exn_fmt, strtotime($dt) ?: 0);
-    $start_str     = gmdate($start_fmt, strtotime($start) ?: 0);
-    return date_create_immutable($exception_str . $start_str);
+    $dt_str    = gmdate($dt_fmt, strtotime($dt) ?: 0);
+    $start_str = gmdate($start_fmt, strtotime($start) ?: 0);
+    return date_create_immutable($dt_str . $start_str);
   }
 }
