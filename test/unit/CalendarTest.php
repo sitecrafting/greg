@@ -351,6 +351,61 @@ class CalendarTest extends BaseTest {
     ], $summary);
   }
 
+  public function test_recurrences_weekly_spanning_multiple_months() {
+    $events = [
+      [
+        'start'                  => '2020-11-11 09:00:00',
+        'end'                    => '2020-11-11 17:00:00',
+        'title'                  => 'Weekly Event spanning months',
+        'recurrence'             => [
+          'until'                => '2021-03-10 09:00:00',
+          'frequency'            => 'weekly',
+          'exceptions'           => [],
+        ],
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $dec_recurrences = $calendar->recurrences([
+      'earliest' => '2020-12-01 00:00:00',
+      'latest'   => '2020-12-31 23:59:59',
+    ]);
+
+    $this->assertEquals('2020-12-02 09:00:00', $dec_recurrences[0]['start']);
+    $this->assertEquals('2020-12-09 09:00:00', $dec_recurrences[1]['start']);
+    $this->assertEquals('2020-12-16 09:00:00', $dec_recurrences[2]['start']);
+    $this->assertEquals('2020-12-23 09:00:00', $dec_recurrences[3]['start']);
+    $this->assertEquals('2020-12-30 09:00:00', $dec_recurrences[4]['start']);
+
+    $jan_recurrences = $calendar->recurrences([
+      'earliest' => '2021-01-01 00:00:00',
+      'latest'   => '2021-01-31 23:59:59',
+    ]);
+
+    $this->assertEquals('2021-01-06 09:00:00', $jan_recurrences[0]['start']);
+    $this->assertEquals('2021-01-13 09:00:00', $jan_recurrences[1]['start']);
+    $this->assertEquals('2021-01-20 09:00:00', $jan_recurrences[2]['start']);
+    $this->assertEquals('2021-01-27 09:00:00', $jan_recurrences[3]['start']);
+
+    $feb_recurrences = $calendar->recurrences([
+      'earliest' => '2021-02-01 00:00:00',
+      'latest'   => '2021-02-28 23:59:59',
+    ]);
+
+    $this->assertEquals('2021-02-03 09:00:00', $feb_recurrences[0]['start']);
+    $this->assertEquals('2021-02-10 09:00:00', $feb_recurrences[1]['start']);
+    $this->assertEquals('2021-02-17 09:00:00', $feb_recurrences[2]['start']);
+    $this->assertEquals('2021-02-24 09:00:00', $feb_recurrences[3]['start']);
+
+    $mar_recurrences = $calendar->recurrences([
+      'earliest' => '2021-03-01 00:00:00',
+      'latest'   => '2021-03-31 23:59:59',
+    ]);
+
+    $this->assertEquals('2021-03-03 09:00:00', $mar_recurrences[0]['start']);
+  }
+
   /**
    * Test date-limit issue: https://github.com/sitecrafting/greg/issues/4
    */

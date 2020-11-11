@@ -104,9 +104,9 @@ class Calendar {
     $rules = $event['recurrence'];
     $rset  = new RSet();
     $rrule = new RRule([
-      'DTSTART' => $this->rrule_start($event, $constraints),
+      'DTSTART' => $event['start'],
       'FREQ'    => strtoupper($rules['frequency']),
-      'UNTIL'   => $this->rrule_until($event, $constraints),
+      'UNTIL'   => $rules['until'],
     ]);
     $rset->addRRule($rrule);
 
@@ -126,58 +126,59 @@ class Calendar {
     $description = $this->describe($event, $rrule);
 
     foreach ($rset->getOccurrences() as $recurrence) {
-      $end           = $this->end_from_start($recurrence, $duration);
-      $recurrences[] = array_merge($event, [
+      $end        = $this->end_from_start($recurrence, $duration);
+      $recurrence = array_merge($event, [
         'start'                  => $recurrence->format('Y-m-d H:i:s'),
         'end'                    => $end->format('Y-m-d H:i:s'),
         'recurrence_description' => $description,
       ]);
+
+      if ($this->satisfies($recurrence, $constraints)) {
+        $recurrences[] = $recurrence;
+      }
     }
 
     return $recurrences;
   }
 
   /**
-   * Given a recurring event and query constraints, return the actual
-   * DTSTART RRULE param to use in recurrence expansion.
+   * Whether the given event/recurrence satisfies all $constraints
    *
-   * @internal
+   * @param array $recurrence the recurrence/event in question
+   * @param array $constraints the constraints by which events should be limited
+   * @return bool
    */
-  protected function rrule_start(array $event, array $constraints) : string {
-    $earliest = $constraints['earliest'] ?? '';
+  protected function satisfies(array $recurrence, array $constraints) : bool {
+    if (!empty($constraints['event_month'])) {
+      $month = date_create_immutable($constraints['event_month']);
+      if (!$month) {
+        // We can't parse this; assume no match.
+        return false;
+      }
 
-    if ($earliest && $earliest > $event['start']) {
-      $start    = date_create_immutable($event['start']);
-      $earliest = date_create_immutable($earliest);
+      $constraints['earliest'] = $month->format('Y-m-01 00:00:00');
 
-      return ($start && $earliest)
-        ? $earliest->format('Y-m-d ') . $start->format('H:i:s')
-        : $event['start']; // something weird happened
+      $constraints['latest'] = $month
+        ->modify('+1 month')
+        ->modify('-1 second')
+        ->format('Y-m-d 23:59:59');
     }
 
-    return $event['start'];
-  }
-
-  /**
-   * Given a recurring event and query constraints, return the actual
-   * UNTIL RRULE param to use in recurrence expansion.
-   *
-   * @internal
-   */
-  protected function rrule_until(array $event, array $constraints) : string {
-    $rules  = $event['recurrence'];
-    $latest = $constraints['latest'] ?? '';
-
-    if ($latest && $latest < $rules['until']) {
-      $until  = date_create_immutable($rules['until']);
-      $latest = date_create_immutable($latest);
-
-      return ($until && $latest)
-        ? $latest->format('Y-m-d ') . $until->format('H:i:s')
-        : $rules['until']; // something weird happened
+    if (
+      !empty($constraints['earliest'])
+      && $recurrence['start'] < $constraints['earliest']
+    ) {
+      return false;
     }
 
-    return $rules['until'];
+    if (
+      !empty($constraints['latest'])
+      && $recurrence['start'] > $constraints['latest']
+    ) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
