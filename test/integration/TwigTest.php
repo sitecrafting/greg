@@ -18,7 +18,6 @@ use Timber\Timber;
  */
 class TwigTest extends IntegrationTest {
   public function test_greg_event_month() {
-    $this->markTestSkipped();
     set_query_var('event_month', '2020-05');
     $this->assertEquals('May 2020', Timber::compile_string(
       '{{ greg_event_month("F Y") }}'
