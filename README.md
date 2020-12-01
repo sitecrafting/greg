@@ -101,8 +101,8 @@ Timber::render('archive-greg_event.twig', $data);
     {% endfor %}
 
     <div class="pagination">
-      <a href="?event_month={{ greg_prev_month() }}">{{ greg_prev_month('F') }} Events</a>
-      <a href="?event_month={{ greg_next_month() }}">{{ greg_next_month('F') }} Events</a>
+      <a href="{{ greg_prev_month_query_string() }}">{{ greg_prev_month('F') }} Events</a>
+      <a href="{{ greg_next_month_query_string() }}">{{ greg_next_month('F') }} Events</a>
     </div>
 
   </main>
@@ -189,10 +189,8 @@ Timber::render('archive-greg_event_category.twig', $data);
 
 		{# Persist any already-applied Event filters #}
     <div class="pagination">
-      <a href="?event_month={{ greg_prev_month() }}&event_category={{ greg_event_category() }}"
-      >{{ greg_prev_month('F') }} Events</a>
-      <a href="?event_month={{ greg_next_month() }}&event_category={{ greg_event_category() }}"
-      >{{ greg_next_month('F') }} Events</a>
+      <a href="{{ greg_prev_month_query_string() }}">{{ greg_prev_month('F') }} Events</a>
+      <a href="{{ greg_next_month_query_string() }}">{{ greg_next_month('F') }} Events</a>
     </div>
 
   </main>

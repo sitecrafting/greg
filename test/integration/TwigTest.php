@@ -23,4 +23,22 @@ class TwigTest extends IntegrationTest {
       '{{ greg_event_month("F Y") }}'
     ));
   }
+
+  public function test_greg_prev_month_query_string() {
+    set_query_var('event_month', '2020-05');
+
+    $this->assertEquals(
+      '?event_month=2020-04',
+      Timber::compile_string('{{ greg_prev_month_query_string() }}')
+    );
+  }
+
+  public function test_greg_next_month_query_string() {
+    set_query_var('event_month', '2020-05');
+
+    $this->assertEquals(
+      '?event_month=2020-06',
+      Timber::compile_string('{{ greg_next_month_query_string() }}')
+    );
+  }
 }

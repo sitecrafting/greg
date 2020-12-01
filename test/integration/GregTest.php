@@ -409,4 +409,44 @@ class GregTest extends IntegrationTest {
     set_query_var('event_category', 'NOT THIS GARBAGE AGAIN');
     $this->assertFalse(Greg\event_category());
   }
+
+  public function test_prev_month_query_string() {
+    set_query_var('event_month', '2020-11');
+    $this->assertEquals('?event_month=2020-10', Greg\prev_month_query_string());
+  }
+
+  public function test_prev_month_query_string_with_category() {
+    $id = $this->factory->term->create([
+      'taxonomy' => 'greg_event_category',
+      'name'     => 'Test Cat',
+    ]);
+
+    set_query_var('event_category', $id);
+    set_query_var('event_month', '2020-11');
+
+    $this->assertEquals(
+      '?event_month=2020-10&event_category=test-cat',
+      Greg\prev_month_query_string()
+    );
+  }
+
+  public function test_next_month_query_string() {
+    set_query_var('event_month', '2020-11');
+    $this->assertEquals('?event_month=2020-12', Greg\next_month_query_string());
+  }
+
+  public function test_next_month_query_string_with_category() {
+    $id = $this->factory->term->create([
+      'taxonomy' => 'greg_event_category',
+      'name'     => 'Test Cat',
+    ]);
+
+    set_query_var('event_category', $id);
+    set_query_var('event_month', '2020-11');
+
+    $this->assertEquals(
+      '?event_month=2020-12&event_category=test-cat',
+      Greg\next_month_query_string()
+    );
+  }
 }

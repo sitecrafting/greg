@@ -227,3 +227,39 @@ function event_category() {
 
   return Timber::get_term($wp_term);
 }
+
+/**
+ * Get the prev_month filter query_string
+ *
+ * @return string
+ */
+function prev_month_query_string() {
+  $params = [
+    'event_month' => prev_month(),
+  ];
+
+  $cat = event_category();
+  if ($cat) {
+    $params['event_category'] = $cat->slug;
+  }
+
+  return '?' . http_build_query($params);
+}
+
+/**
+ * Get the next_month filter query_string
+ *
+ * @return string
+ */
+function next_month_query_string() {
+  $params = [
+    'event_month' => next_month(),
+  ];
+
+  $cat = event_category();
+  if ($cat) {
+    $params['event_category'] = $cat->slug;
+  }
+
+  return '?' . http_build_query($params);
+}
