@@ -481,6 +481,120 @@ add_filter('greg/render/event-categories.twig', function(array $data) : array {
 
 Again, since the default views don't care about any extra data passed to them, you don't need to worry about this unless you are overriding Greg's views from your theme. Because you can always pass a data array directly to `greg_render()`/`Greg\render()`, this is an advanced use-case that you really only need if you want to customize view data **across all usage of a given view.**
 
+### The Event class
+
+The `Greg\Event` class is a wrapper around `Timber\Post` that can be treated mostly interchangeably as a regular Post object. It delegates any non-Greg functionality to the Post instance it is wrapping:
+
+```php
+/* my-event-template.php */
+use Greg\Event;
+use Timber\Timber;
+
+$event = Event::from_post(Timber::get_post(123));
+
+Timber::render('my-event-template.twig', [
+  'event' => $event,
+]);
+```
+
+This means that in your template code you mostly use Event instances as you would a Post:
+
+```twig
+{# my-event-template.twig #}
+<a href="{{ event.link }}">{{ event.title }}</a>
+<span class="byline">organized by {{ event.author }}</span>
+```
+
+However, its main purpose is to provide data specifically suited to displaying date and time information.
+
+#### Start, end, and range
+
+The `Event::range()` is the easiest way to output start and end time together:
+
+```twig
+{{ event.range }}
+{{ event.range('Y-m-d h:i', 'h:i') }}
+{{ event.range('Y-m-d h:i', 'h:i', ' until ') }}
+```
+
+This will output something like:
+
+```
+January 1 9am - 3pm // NOTE: depends on global WP time_format
+2021-01-01 09:00 - 15:00
+2021-01-01 09:00 until 15:00
+```
+
+This is equivalent to:
+
+```twig
+{{ event.start }} - {{ event.end }}
+{{ event.start('Y-m-d h:i') }} - {{ event.end('h:i') }}
+{{ event.start('Y-m-d h:i') }} until {{ event.end('h:i') }}
+```
+
+#### Recurrence information
+
+##### `recurring()`
+
+You may sometimes want to check whether an Event recurs or not:
+
+```twig
+{% if event.recurring %}
+  <span>Recurring</span>
+{% else %}
+  <span>One-time only!</span>
+{% endif %}
+```
+
+Currently this only considers the `until` and `frequency` meta fields passed to `greg/meta_keys`, but this may change in a future version of Greg.
+
+##### `recurrence_range()` and `until()`
+
+The `Event::recurrence_range()` method is like `::range()` except that it deals with `until`, the end date of the recurrence (if any):
+
+```twig
+{{ event.recurrence_range }}
+{{ event.recurrence_range('M jS', 'jS') }}
+{{ event.recurrence_range('M jS', 'jS', ' thru ') }}
+```
+
+This will output something like:
+
+```
+January 1 - 3, 2020
+Jan 1st - 3rd
+Jan 1st thru 3rd
+```
+
+This is equivalent to:
+
+```twig
+{{ event.start('M j') }} - {{ event.until('M j, Y') }}
+{{ event.start('M jS') }} - {{ event.until('M jS') }}
+{{ event.start('M jS') }} until {{ event.until(' M jS ') }}
+```
+
+Note that unlike `::range()`, the default formats in `::recurrence_range()` do **not** depend on global WP settings, which is why the first line above passes args to `start()` and `end()`.
+
+##### `recurrence_description()`
+
+The `Event::recurrence_description()` method returns a human-readable description of the recurrence. Greg will look in the `recurrence_description` key you pass to the `greg/meta_keys` hook. If the meta value is empty (i.e. the admin user put nothing in that field), Greg will generate its own description based on the recurrence data available.
+
+##### `frequency()`
+
+The `Event::frequency()` method returns the RRULE field for recurrence frequency. This corresponds to the `frequency` meta key you pass to the `greg/meta_keys` filter. It is on you to ensure that the value is one of:
+
+* `secondly`
+* `minutely`
+* `hourly`
+* `daily`
+* `weekly`
+* `monthly`
+* `yearly`
+
+These values are case-insensitive. A future version of Greg may take on this responsibility, and manage these values for you, but we're not there yet!
+
 ## Actions & Filters
 
 ### Event query params
