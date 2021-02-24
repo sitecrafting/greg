@@ -301,6 +301,7 @@ class Event implements CoreInterface {
   public function recurrence_description() : string {
     return $this->post->meta(meta_key('recurrence_description'))
       ?: $this->options['recurrence_description']
+      ?? ''
       ?: ''; // ensure we have a string
   }
 
