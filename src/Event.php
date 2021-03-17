@@ -144,7 +144,7 @@ class Event implements CoreInterface {
    * @return self
    */
   public static function from_post(Post $post) : self {
-    return new self($post);
+    return new static($post);
   }
 
   /**
