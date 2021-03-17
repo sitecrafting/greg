@@ -320,12 +320,11 @@ class CalendarTest extends BaseTest {
             ],
             [
               'start'            => '11:30:00',
-              'end'              => '17:30:00', // TODO different duration
+              'end'              => '17:30:00',
               'BYDAY'            => ['SA', 'SU'],
             ],
           ],
         ],
-        'recurrence_description' => 'Thrice.',
       ],
     ];
 
@@ -348,6 +347,101 @@ class CalendarTest extends BaseTest {
       '2021-03-05 10:00:00 - 15:00:00',
       '2021-03-06 11:30:00 - 17:30:00',
       '2021-03-07 11:30:00 - 17:30:00',
+    ], $starts);
+  }
+
+  public function test_recurrences_with_overrides_weekly() {
+    // single event series:
+    // - 3/1 - 3/7 M/W/F 10am - 3pm, Sat/Sun 11:30am - 4:30pm
+    $events = [
+      [
+        'start'                  => '2021-03-01 10:00:00',
+        'end'                    => '2021-03-01 15:00:00',
+        'title'                  => 'Three Times',
+        'recurrence'             => [
+          'until'                => '2021-03-07 15:00:00',
+          'frequency'            => 'Weekly',
+          'exceptions'           => [],
+          'overrides'            => [
+            [
+              'start'            => '10:00:00',
+              'end'              => '15:00:00',
+              'BYDAY'            => ['MO', 'WE', 'FR'],
+            ],
+            [
+              'start'            => '11:30:00',
+              'end'              => '17:30:00',
+              'BYDAY'            => ['SA', 'SU'],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $starts = array_map(function(array $recurrence) {
+      return sprintf(
+        '%s - %s',
+        $recurrence['start'],
+        gmdate('H:i:s', strtotime($recurrence['end']))
+      );
+    }, $calendar->recurrences());
+
+    $this->assertEquals([
+      '2021-03-01 10:00:00 - 15:00:00',
+      '2021-03-03 10:00:00 - 15:00:00',
+      '2021-03-05 10:00:00 - 15:00:00',
+      '2021-03-06 11:30:00 - 17:30:00',
+      '2021-03-07 11:30:00 - 17:30:00',
+    ], $starts);
+  }
+
+  public function test_recurrences_with_overrides_monthly() {
+    // single event series:
+    // - 3/1 - 5/17 every 1st Mon at 5pm & every 3rd Mon at 3pm
+    $events = [
+      [
+        'start'                  => '2021-03-01 10:00:00',
+        'end'                    => '2021-03-01 15:00:00',
+        'title'                  => 'Three Times',
+        'recurrence'             => [
+          'until'                => '2021-05-17 15:00:00',
+          'frequency'            => 'Monthly',
+          'exceptions'           => [],
+          'overrides'            => [
+            [
+              'start'            => '17:00:00',
+              'end'              => '18:00:00',
+              'BYDAY'            => '1MO',
+            ],
+            [
+              'start'            => '15:00:00',
+              'end'              => '16:00:00',
+              'BYDAY'            => '3MO',
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $starts = array_map(function(array $recurrence) {
+      return sprintf(
+        '%s - %s',
+        $recurrence['start'],
+        gmdate('H:i:s', strtotime($recurrence['end']))
+      );
+    }, $calendar->recurrences());
+
+    $this->assertEquals([
+      '2021-03-01 17:00:00 - 18:00:00',
+      '2021-03-15 15:00:00 - 16:00:00',
+      '2021-04-05 17:00:00 - 18:00:00',
+      '2021-04-19 15:00:00 - 16:00:00',
+      '2021-05-03 17:00:00 - 18:00:00',
+      '2021-05-17 15:00:00 - 16:00:00',
     ], $starts);
   }
 
