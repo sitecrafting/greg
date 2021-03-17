@@ -295,6 +295,7 @@ class EventTest extends IntegrationTest {
         'frequency'              => 'my_frequency',
         'until'                  => 'my_until',
         'exceptions'             => 'my_exceptions',
+        'overrides'              => 'my_overrides',
         'recurrence_description' => 'my_recurrence_description',
       ];
     });
@@ -305,6 +306,7 @@ class EventTest extends IntegrationTest {
     $end        = '2020-11-01 15:00:00';
     $until      = '2020-11-08 13:30:00';
     $exceptions = ['2020-11-03', '2020-11-06'];
+    $overrides  = [];
 
     $this->factory->post->create([
       'post_type'                   => 'greg_event',
@@ -315,6 +317,7 @@ class EventTest extends IntegrationTest {
         'my_frequency'              => 'DAILY',
         'my_until'                  => $until,
         'my_exceptions'             => $exceptions,
+        'my_overrides'              => $overrides,
         'my_recurrence_description' => 'Daily except for, like, a couple times',
       ],
     ]);

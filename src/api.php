@@ -136,6 +136,7 @@ function get_events(array $params = []) {
  * * until
  * * frequency
  * * exceptions
+ * * overrides
  * * recurrence_description
  * @return string
  * @throws InvalidArgumentException if passed a bad field name, or if the key

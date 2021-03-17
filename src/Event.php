@@ -30,6 +30,7 @@ class Event implements CoreInterface {
     'until'                  => 'until',
     'frequency'              => 'frequency',
     'exceptions'             => 'exceptions',
+    'overrides'              => 'overrides',
     'recurrence_description' => 'recurrence_description',
   ];
 
@@ -119,6 +120,7 @@ class Event implements CoreInterface {
         'until'      => $until,
         'frequency'  => $frequency,
         'exceptions' => $post->meta(meta_key('exceptions')) ?: [],
+        'overrides'  => $post->meta(meta_key('overrides')) ?: [],
       ];
     }
 

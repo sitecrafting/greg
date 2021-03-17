@@ -300,6 +300,57 @@ class CalendarTest extends BaseTest {
     ], $starts);
   }
 
+  public function test_recurrences_with_overrides() {
+    // single event series:
+    // - 3/1 - 3/7 M/W/F 10am - 3pm, Sat/Sun 11:30am - 4:30pm
+    $events = [
+      [
+        'start'                  => '2021-03-01 10:00:00',
+        'end'                    => '2021-03-01 15:00:00',
+        'title'                  => 'Three Times',
+        'recurrence'             => [
+          'until'                => '2021-03-07 15:00:00',
+          'frequency'            => 'Daily',
+          'exceptions'           => [],
+          'overrides'            => [
+            [
+              'start'            => '10:00:00',
+              'end'              => '15:00:00',
+              'BYDAY'            => ['MO', 'WE', 'FR'],
+            ],
+            [
+              'start'            => '11:30:00',
+              'end'              => '17:30:00', // TODO different duration
+              'BYDAY'            => ['SA', 'SU'],
+            ],
+          ],
+        ],
+        'recurrence_description' => 'Thrice.',
+      ],
+    ];
+
+    $calendar = new Calendar($events);
+
+    $starts = array_map(function(array $recurrence) {
+      return sprintf(
+        '%s - %s',
+        $recurrence['start'],
+        gmdate('H:i:s', strtotime($recurrence['end']))
+      );
+    }, $calendar->recurrences([
+      'earliest' => '2021-03-01',
+      'latest'   => '2021-03-10',
+    ]));
+
+    $this->assertEquals([
+      '2021-03-01 10:00:00 - 15:00:00',
+      '2021-03-03 10:00:00 - 15:00:00',
+      '2021-03-05 10:00:00 - 15:00:00',
+      '2021-03-06 11:30:00 - 17:30:00',
+      '2021-03-07 11:30:00 - 17:30:00',
+    ], $starts);
+  }
+
   /**
    * Test sorting issue: https://github.com/sitecrafting/greg/issues/4
    */

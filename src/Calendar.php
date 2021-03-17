@@ -103,12 +103,43 @@ class Calendar {
 
     $rules = $event['recurrence'];
     $rset  = new RSet();
-    $rrule = new RRule([
-      'DTSTART' => $event['start'],
-      'FREQ'    => strtoupper($rules['frequency']),
-      'UNTIL'   => $rules['until'],
-    ]);
-    $rset->addRRule($rrule);
+
+    $override_durations = [];
+    $rrules             = [];
+    if (!empty($rules['overrides'])) {
+      $start_date = gmdate('Y-m-d', strtotime($event['start']));
+      $end_date   = gmdate('Y-m-d', strtotime($event['end']));
+
+      foreach ($rules['overrides'] as $override) {
+        // Support different durations for recurrences from overridden RRules.
+        $override_durations[$override['start']] = $this->duration(
+          $start_date . ' ' . $override['start'],
+          $end_date . ' ' . $override['end']
+        );
+
+        $rrules[] = new RRule([
+          'DTSTART' => $start_date . ' ' . $override['start'],
+          'BYDAY'   => $override['BYDAY'] ?? [],
+          'FREQ'    => strtoupper($rules['frequency']),
+          'UNTIL'   => $rules['until'],
+        ]);
+      }
+    } else {
+      $rrules = [
+        new RRule([
+          'DTSTART' => $event['start'],
+          'FREQ'    => strtoupper($rules['frequency']),
+          'UNTIL'   => $rules['until'],
+        ]),
+      ];
+
+      $start_time             = gmdate('H:i:s', strtotime($event['start']));
+      $durations[$start_time] = $this->duration($event['start'], $event['end']);
+    }
+
+    foreach ($rrules as $rrule) {
+      $rset->addRRule($rrule);
+    }
 
     foreach ($this->normalize_exceptions($event) as $exception) {
       $rset->addExDate($exception);
@@ -116,16 +147,14 @@ class Calendar {
 
     $duration = $this->duration($event['start'], $event['end']);
 
-    if (!isset($duration)) {
-      // Something went wrong and we can't reliably compute recurrences.
-      return $recurrences;
-    }
-
     // Get the human-readable description of the recurrence from the event
     // itself, or generate it from the RRule
-    $description = $this->describe($event, $rrule);
+    $description = $this->describe($event, $rrules[0]);
 
     foreach ($rset->getOccurrences() as $recurrence) {
+      if ($override_durations) {
+        $duration = $override_durations[$recurrence->format('H:i:s')];
+      }
       $end        = $this->end_from_start($recurrence, $duration);
       $recurrence = array_merge($event, [
         'start'                  => $recurrence->format('Y-m-d H:i:s'),
@@ -187,14 +216,24 @@ class Calendar {
    * @param string $start start date string
    * @param string $end end date string
    * @return DateInterval the derived duration
+   * @throws InvalidArgumentException if $start or $end is invalid
    */
-  protected function duration(string $start, string $end) : ?DateInterval {
+  protected function duration(string $start, string $end) : DateInterval {
     // TODO option to create from format
     $from = date_create_immutable($start);
     $to   = date_create_immutable($end);
 
-    if (empty($from) || empty($to)) {
-      return null;
+    if (empty($from)) {
+      throw new InvalidArgumentException(sprintf(
+        'Invalid date string: %s',
+        $start
+      ));
+    }
+    if (empty($to)) {
+      throw new InvalidArgumentException(sprintf(
+        'Invalid date string: %s',
+        $end
+      ));
     }
 
     return $from->diff($to);
