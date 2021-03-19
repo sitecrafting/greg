@@ -235,11 +235,12 @@ If you want to, you can also tell Greg to give you just the three Events, in cas
 ```php
 add_filter('greg/meta_keys', function() : array {
   return [
-    'start'                  => 'my_start_date_key',
-    'end'                    => 'my_end_date_key',
-    'frequency'              => 'my_frequency_key',
-    'until'                  => 'my_until_key',
-    'exceptions'             => 'my_exceptions_key',
+    'start'                  => 'my_start_date',
+    'end'                    => 'my_end_date',
+    'frequency'              => 'my_frequency',
+    'until'                  => 'my_until',
+    'exceptions'             => 'my_exceptions',
+    'overrides'              => 'my_overrides',
     'recurrence_description' => 'my_recurrence_description',
   ];
 });
@@ -299,7 +300,7 @@ $events = Timber::get_posts([
   'meta_query'   => [
     'relation'   => 'AND',
     [
-      'key'      => 'my_start_date_key',
+      'key'      => 'my_start_date',
       'value'    => '2020-11-01',
       'compare'  => '>=',
       'type'     => 'DATETIME',
