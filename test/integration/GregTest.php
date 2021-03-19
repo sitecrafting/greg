@@ -40,11 +40,11 @@ class GregTest extends IntegrationTest {
       ],
     ]);
     $this->factory->post->create([
-      'post_type'  => 'greg_event',
-      'post_title' => 'My Upcoming Event',
-      'meta_input' => [
-        'start'    => date_create_immutable('now')->modify('+5 weeks')->format('Y-m-d 00:00:00'),
-        'end'      => date_create_immutable('now')->modify('+6 weeks')->format('Y-m-d 00:00:00'),
+      'post_type'    => 'greg_event',
+      'post_title'   => 'My Upcoming Event',
+      'meta_input'   => [
+        'greg_start' => date_create_immutable('now')->modify('+5 weeks')->format('Y-m-d 00:00:00'),
+        'greg_end'   => date_create_immutable('now')->modify('+6 weeks')->format('Y-m-d 00:00:00'),
       ],
     ]);
 
@@ -53,11 +53,11 @@ class GregTest extends IntegrationTest {
 
   public function test_get_events_single_default() {
     $this->factory->post->create([
-      'post_type'  => 'greg_event',
-      'post_title' => 'My Single Event',
-      'meta_input' => [
-        'start'    => '2020-03-03 09:00:00',
-        'end'      => '2020-03-04 09:00:00',
+      'post_type'    => 'greg_event',
+      'post_title'   => 'My Single Event',
+      'meta_input'   => [
+        'greg_start' => '2020-03-03 09:00:00',
+        'greg_end'   => '2020-03-04 09:00:00',
       ],
     ]);
 
@@ -72,13 +72,13 @@ class GregTest extends IntegrationTest {
 
   public function test_get_events_with_recurrences() {
     $this->factory->post->create([
-      'post_type'   => 'greg_event',
-      'post_title'  => 'My Recurring Event',
-      'meta_input'  => [
-        'start'     => '2020-10-11 10:00:00',
-        'end'       => '2020-10-12 11:00:00',
-        'frequency' => 'DAILY',
-        'until'     => '2020-10-17 10:00:00',
+      'post_type'        => 'greg_event',
+      'post_title'       => 'My Recurring Event',
+      'meta_input'       => [
+        'greg_start'     => '2020-10-11 10:00:00',
+        'greg_end'       => '2020-10-12 11:00:00',
+        'greg_frequency' => 'DAILY',
+        'greg_until'     => '2020-10-17 10:00:00',
       ],
     ]);
 
@@ -95,14 +95,14 @@ class GregTest extends IntegrationTest {
 
   public function test_get_events_with_recurrences_and_exceptions() {
     $this->factory->post->create([
-      'post_type'    => 'greg_event',
-      'post_title'   => 'My Recurring Event',
-      'meta_input'   => [
-        'start'      => '2020-10-11 10:00:00',
-        'end'        => '2020-10-12 11:00:00',
-        'frequency'  => 'DAILY',
-        'until'      => '2020-10-17 10:00:00',
-        'exceptions' => ['2020-10-13 10:00:00', '2020-10-16 10:00:00'],
+      'post_type'         => 'greg_event',
+      'post_title'        => 'My Recurring Event',
+      'meta_input'        => [
+        'greg_start'      => '2020-10-11 10:00:00',
+        'greg_end'        => '2020-10-12 11:00:00',
+        'greg_frequency'  => 'DAILY',
+        'greg_until'      => '2020-10-17 10:00:00',
+        'greg_exceptions' => ['2020-10-13 10:00:00', '2020-10-16 10:00:00'],
       ],
     ]);
 
@@ -119,13 +119,13 @@ class GregTest extends IntegrationTest {
 
   public function test_get_events_skip_expansion() {
     $this->factory->post->create([
-      'post_type'   => 'greg_event',
-      'post_title'  => 'My Event Series',
-      'meta_input'  => [
-        'start'     => '2020-09-05 14:00:00',
-        'end'       => '2020-09-05 16:30:00',
-        'frequency' => 'DAILY',
-        'until'     => '2020-09-11 14:00:00',
+      'post_type'        => 'greg_event',
+      'post_title'       => 'My Event Series',
+      'meta_input'       => [
+        'greg_start'     => '2020-09-05 14:00:00',
+        'greg_end'       => '2020-09-05 16:30:00',
+        'greg_frequency' => 'DAILY',
+        'greg_until'     => '2020-09-11 14:00:00',
       ],
     ]);
 
@@ -142,36 +142,36 @@ class GregTest extends IntegrationTest {
   public function test_get_events_mixed() {
     $event_data = [
       [
-        'post_type'                => 'greg_event',
-        'post_title'               => 'Costume Party!',
-        'post_date'                => '2020-10-21 00:00:00',
-        'meta_input'               => [
-          'start'                  => '2020-10-31 21:00:00',
-          'end'                    => '2020-10-31 23:30:00',
-          'recurrence_description' => '',
+        'post_type'                     => 'greg_event',
+        'post_title'                    => 'Costume Party!',
+        'post_date'                     => '2020-10-21 00:00:00',
+        'meta_input'                    => [
+          'greg_start'                  => '2020-10-31 21:00:00',
+          'greg_end'                    => '2020-10-31 23:30:00',
+          'greg_recurrence_description' => '',
         ],
       ],
       [
-        'post_type'                => 'greg_event',
-        'post_title'               => 'Party Planning',
-        'post_date'                => '2020-10-22 00:00:00',
-        'meta_input'               => [
-          'start'                  => '2020-10-29 11:00:00',
-          'end'                    => '2020-10-29 12:00:00',
-          'recurrence_description' => '',
+        'post_type'                     => 'greg_event',
+        'post_title'                    => 'Party Planning',
+        'post_date'                     => '2020-10-22 00:00:00',
+        'meta_input'                    => [
+          'greg_start'                  => '2020-10-29 11:00:00',
+          'greg_end'                    => '2020-10-29 12:00:00',
+          'greg_recurrence_description' => '',
         ],
       ],
       [
-        'post_type'                => 'greg_event',
-        'post_title'               => 'Recurring Event',
-        'post_date'                => '2020-10-23 00:00:00',
-        'meta_input'               => [
-          'start'                  => '2020-10-28 12:00:00',
-          'end'                    => '2020-10-28 12:30:00',
-          'until'                  => '2020-11-02 12:00:00',
-          'frequency'              => 'daily',
-          'exceptions'             => [],
-          'recurrence_description' => 'Daily from the 28th thru Nov. 2nd',
+        'post_type'                     => 'greg_event',
+        'post_title'                    => 'Recurring Event',
+        'post_date'                     => '2020-10-23 00:00:00',
+        'meta_input'                    => [
+          'greg_start'                  => '2020-10-28 12:00:00',
+          'greg_end'                    => '2020-10-28 12:30:00',
+          'greg_until'                  => '2020-11-02 12:00:00',
+          'greg_frequency'              => 'daily',
+          'greg_exceptions'             => [],
+          'greg_recurrence_description' => 'Daily from the 28th thru Nov. 2nd',
         ],
       ],
     ];
@@ -205,14 +205,14 @@ class GregTest extends IntegrationTest {
   public function test_get_events_limit_earliest() {
     // multiple events, with the first one recurring
     $this->factory->post->create([
-      'post_title'   => 'Recurring Event',
-      'post_type'    => 'greg_event',
-      'meta_input'   => [
-        'start'      => '2020-09-25 12:00:00',
-        'end'        => '2020-09-25 12:30:00',
-        'until'      => '2020-11-15 12:00:00',
-        'frequency'  => 'daily',
-        'exceptions' => [],
+      'post_title'        => 'Recurring Event',
+      'post_type'         => 'greg_event',
+      'meta_input'        => [
+        'greg_start'      => '2020-09-25 12:00:00',
+        'greg_end'        => '2020-09-25 12:30:00',
+        'greg_until'      => '2020-11-15 12:00:00',
+        'greg_frequency'  => 'daily',
+        'greg_exceptions' => [],
       ],
     ]);
 
@@ -233,14 +233,14 @@ class GregTest extends IntegrationTest {
    */
   public function test_get_events_limit_latest() {
     $this->factory->post->create([
-      'post_title'   => 'Recurring Event',
-      'post_type'    => 'greg_event',
-      'meta_input'   => [
-        'start'      => '2020-09-25 12:00:00',
-        'end'        => '2020-09-25 12:30:00',
-        'until'      => '2020-11-15 12:00:00',
-        'frequency'  => 'daily',
-        'exceptions' => [],
+      'post_title'        => 'Recurring Event',
+      'post_type'         => 'greg_event',
+      'meta_input'        => [
+        'greg_start'      => '2020-09-25 12:00:00',
+        'greg_end'        => '2020-09-25 12:30:00',
+        'greg_until'      => '2020-11-15 12:00:00',
+        'greg_frequency'  => 'daily',
+        'greg_exceptions' => [],
       ],
     ]);
 
@@ -260,14 +260,14 @@ class GregTest extends IntegrationTest {
    */
   public function test_get_events_limit_event_month() {
     $this->factory->post->create([
-      'post_title'   => 'Recurring Event',
-      'post_type'    => 'greg_event',
-      'meta_input'   => [
-        'start'      => '2020-09-25 12:00:00',
-        'end'        => '2020-09-25 12:30:00',
-        'until'      => '2020-11-15 12:00:00',
-        'frequency'  => 'daily',
-        'exceptions' => [],
+      'post_title'        => 'Recurring Event',
+      'post_type'         => 'greg_event',
+      'meta_input'        => [
+        'greg_start'      => '2020-09-25 12:00:00',
+        'greg_end'        => '2020-09-25 12:30:00',
+        'greg_until'      => '2020-11-15 12:00:00',
+        'greg_frequency'  => 'daily',
+        'greg_exceptions' => [],
       ],
     ]);
 
@@ -289,14 +289,14 @@ class GregTest extends IntegrationTest {
     ]);
 
     $id = $this->factory->post->create([
-      'post_title'   => 'COME PLAY WITH DOGS',
-      'post_type'    => 'greg_event',
-      'meta_input'   => [
-        'start'      => '2020-09-25 12:00:00',
-        'end'        => '2020-09-25 12:30:00',
-        'until'      => '2020-11-15 12:00:00',
-        'frequency'  => 'daily',
-        'exceptions' => [],
+      'post_title'        => 'COME PLAY WITH DOGS',
+      'post_type'         => 'greg_event',
+      'meta_input'        => [
+        'greg_start'      => '2020-09-25 12:00:00',
+        'greg_end'        => '2020-09-25 12:30:00',
+        'greg_until'      => '2020-11-15 12:00:00',
+        'greg_frequency'  => 'daily',
+        'greg_exceptions' => [],
       ],
     ]);
     wp_set_post_terms($id, [$term_id], 'greg_event_category');

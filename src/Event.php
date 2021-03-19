@@ -25,13 +25,13 @@ class Event implements CoreInterface {
    * @var array
    */
   const DEFAULT_META_KEYS = [
-    'start'                  => 'start',
-    'end'                    => 'end',
-    'until'                  => 'until',
-    'frequency'              => 'frequency',
-    'exceptions'             => 'exceptions',
-    'overrides'              => 'overrides',
-    'recurrence_description' => 'recurrence_description',
+    'start'                  => 'greg_start',
+    'end'                    => 'greg_end',
+    'until'                  => 'greg_until',
+    'frequency'              => 'greg_frequency',
+    'exceptions'             => 'greg_exceptions',
+    'overrides'              => 'greg_overrides',
+    'recurrence_description' => 'greg_recurrence_description',
   ];
 
   /**

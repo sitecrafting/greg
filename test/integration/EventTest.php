@@ -25,11 +25,11 @@ class EventTest extends IntegrationTest {
     $end   = '2020-11-01 15:00:00';
 
     $this->factory->post->create([
-      'post_type'                => 'greg_event',
-      'post_title'               => 'My Single Event',
-      'meta_input'               => [
-        'start'                  => $start,
-        'end'                    => $end,
+      'post_type'    => 'greg_event',
+      'post_title'   => 'My Single Event',
+      'meta_input'   => [
+        'greg_start' => $start,
+        'greg_end'   => $end,
       ],
     ]);
 
@@ -54,11 +54,11 @@ class EventTest extends IntegrationTest {
     $end   = '2020-11-01 15:00:00';
 
     $this->factory->post->create([
-      'post_type'                => 'greg_event',
-      'post_title'               => 'My Single Event',
-      'meta_input'               => [
-        'start'                  => $start,
-        'end'                    => $end,
+      'post_type'    => 'greg_event',
+      'post_title'   => 'My Single Event',
+      'meta_input'   => [
+        'greg_start' => $start,
+        'greg_end'   => $end,
       ],
     ]);
 
@@ -81,13 +81,13 @@ class EventTest extends IntegrationTest {
     $exceptions = ['2020-11-03', '2020-11-06'];
 
     $this->factory->post->create([
-      'post_type'                => 'greg_event',
-      'post_title'               => 'My Recurring Event',
-      'meta_input'               => [
-        'start'                  => $start,
-        'end'                    => $end,
-        'frequency'              => 'DAILY',
-        'until'                  => $until,
+      'post_type'        => 'greg_event',
+      'post_title'       => 'My Recurring Event',
+      'meta_input'       => [
+        'greg_start'     => $start,
+        'greg_end'       => $end,
+        'greg_frequency' => 'DAILY',
+        'greg_until'     => $until,
       ],
     ]);
 
@@ -118,10 +118,10 @@ class EventTest extends IntegrationTest {
       'post_type'                => 'greg_event',
       'post_title'               => 'My Recurring Event',
       'meta_input'               => [
-        'start'                  => $start,
-        'end'                    => $end,
-        'frequency'              => 'DAILY',
-        'until'                  => $until,
+        'greg_start'                  => $start,
+        'greg_end'                    => $end,
+        'greg_frequency'              => 'DAILY',
+        'greg_until'                  => $until,
       ],
     ]);
 
@@ -146,13 +146,13 @@ class EventTest extends IntegrationTest {
     $until = '2020-11-05 13:30:00';
 
     $this->factory->post->create([
-      'post_type'                => 'greg_event',
-      'post_title'               => 'My Recurring Event',
-      'meta_input'               => [
-        'start'                  => $start,
-        'end'                    => $end,
-        'frequency'              => 'DAILY',
-        'until'                  => $until,
+      'post_type'        => 'greg_event',
+      'post_title'       => 'My Recurring Event',
+      'meta_input'       => [
+        'greg_start'     => $start,
+        'greg_end'       => $end,
+        'greg_frequency' => 'DAILY',
+        'greg_until'     => $until,
       ],
     ]);
 
@@ -177,13 +177,13 @@ class EventTest extends IntegrationTest {
     $until = '2020-11-05 13:30:00';
 
     $this->factory->post->create([
-      'post_type'                => 'greg_event',
-      'post_title'               => 'My Recurring Event',
-      'meta_input'               => [
-        'start'                  => $start,
-        'end'                    => $end,
-        'frequency'              => 'DAILY',
-        'until'                  => $until,
+      'post_type'        => 'greg_event',
+      'post_title'       => 'My Recurring Event',
+      'meta_input'       => [
+        'greg_start'     => $start,
+        'greg_end'       => $end,
+        'greg_frequency' => 'DAILY',
+        'greg_until'     => $until,
       ],
     ]);
 
@@ -208,14 +208,14 @@ class EventTest extends IntegrationTest {
     $until = '2020-11-10 13:30:00';
 
     $this->factory->post->create([
-      'post_type'                => 'greg_event',
-      'post_title'               => 'My Recurring Event',
-      'meta_input'               => [
-        'start'                  => $start,
-        'end'                    => $end,
-        'frequency'              => 'DAILY',
-        'until'                  => $until,
-        'exceptions'             => [],
+      'post_type'         => 'greg_event',
+      'post_title'        => 'My Recurring Event',
+      'meta_input'        => [
+        'greg_start'      => $start,
+        'greg_end'        => $end,
+        'greg_frequency'  => 'DAILY',
+        'greg_until'      => $until,
+        'greg_exceptions' => [],
       ],
     ]);
 
@@ -235,14 +235,14 @@ class EventTest extends IntegrationTest {
     $until = '2020-11-10 13:30:00';
 
     $this->factory->post->create([
-      'post_type'                => 'greg_event',
-      'post_title'               => 'My Recurring Event',
-      'meta_input'               => [
-        'start'                  => $start,
-        'end'                    => $end,
-        'frequency'              => 'DAILY',
-        'until'                  => $until,
-        'exceptions'             => [],
+      'post_type'         => 'greg_event',
+      'post_title'        => 'My Recurring Event',
+      'meta_input'        => [
+        'greg_start'      => $start,
+        'greg_end'        => $end,
+        'greg_frequency'  => 'DAILY',
+        'greg_until'      => $until,
+        'greg_exceptions' => [],
       ],
     ]);
 
@@ -267,15 +267,15 @@ class EventTest extends IntegrationTest {
     $exceptions = ['2020-11-03', '2020-11-06'];
 
     $this->factory->post->create([
-      'post_type'                => 'greg_event',
-      'post_title'               => 'My Recurring Event',
-      'meta_input'               => [
-        'start'                  => $start,
-        'end'                    => $end,
-        'frequency'              => 'DAILY',
-        'until'                  => $until,
-        'exceptions'             => $exceptions,
-        'recurrence_description' => 'Daily except for, like, a couple times',
+      'post_type'                     => 'greg_event',
+      'post_title'                    => 'My Recurring Event',
+      'meta_input'                    => [
+        'greg_start'                  => $start,
+        'greg_end'                    => $end,
+        'greg_frequency'              => 'DAILY',
+        'greg_until'                  => $until,
+        'greg_exceptions'             => $exceptions,
+        'greg_recurrence_description' => 'Daily except for, like, a couple times',
       ],
     ]);
 
