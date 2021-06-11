@@ -150,6 +150,8 @@ class EventQuery {
   public function params() : array {
     return array_merge([
       'post_type'  => 'greg_event',
+      // TODO: We should probably allow the user to pass pagination params in
+      'posts_per_page' => -1,
     ], $this->meta_clause(), $this->tax_clause());
   }
 
