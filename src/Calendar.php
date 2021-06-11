@@ -112,14 +112,24 @@ class Calendar {
 
       foreach ($rules['overrides'] as $override) {
         // Support different durations for recurrences from overridden RRules.
-        $override_durations[$override['start']] = $this->duration(
-          $start_date . ' ' . $override['start'],
-          $end_date . ' ' . $override['end']
-        );
+        $override_days = $override['BYDAY'] ?? [];
+        if (is_array($override_days) && !empty($override_days)) {
+          foreach ($override_days as $day) {
+            $override_durations[RRule::WEEKDAYS[$day] . '-' . $override['start']] = $this->duration(
+              $start_date . ' ' . $override['start'],
+              $end_date . ' ' . $override['end']
+            );
+          }
+        } else {
+          $override_durations[$override['start']] = $this->duration(
+            $start_date . ' ' . $override['start'],
+            $end_date . ' ' . $override['end']
+          );
+        }
 
         $rrules[] = new RRule([
           'DTSTART' => $start_date . ' ' . $override['start'],
-          'BYDAY'   => $override['BYDAY'] ?? [],
+          'BYDAY'   => $override_days,
           'FREQ'    => strtoupper($rules['frequency']),
           'UNTIL'   => $rules['until'],
         ]);
@@ -153,7 +163,8 @@ class Calendar {
 
     foreach ($rset->getOccurrences() as $recurrence) {
       if ($override_durations) {
-        $duration = $override_durations[$recurrence->format('H:i:s')];
+        $duration = $override_durations[$recurrence->format('N-H:i:s')]
+          ?? $override_durations[$recurrence->format('H:i:s')];
       }
       $end        = $this->end_from_start($recurrence, $duration);
       $recurrence = array_merge($event, [
