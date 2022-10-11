@@ -47,7 +47,7 @@ Let's get one thing out of the way: Greg is **not** a drop-in replacement for Th
 
   * PHP >= 7.4
   * WordPress Core >= 5.5.1
-  * [Timber >= 2.0](https://timber.github.io/docs/v2/)
+  * [Timber 1](https://timber.github.io/docs/)
 
 ## Installation
 
