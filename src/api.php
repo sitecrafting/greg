@@ -216,6 +216,10 @@ function event_category() {
 
   if (!$ident) {
     // Return the current term, if there is one.
+    $queried_object_id = get_queried_object_id();
+    if (!$queried_object_id) {
+      return false;
+    }
     $current_term = Timber::get_term(get_queried_object_id(), 'greg_event_category');
     return $current_term && is_a($current_term, 'Timber\Term') ? $current_term : false;
   }
