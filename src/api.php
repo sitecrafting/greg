@@ -117,13 +117,13 @@ function get_events(array $params = []) {
   // Unless recurrence expansion is explicitly disabled, expand each
   // (potentially) recurring event into its comprising recurrences.
   if ($params['expand_recurrences'] ?? true) {
-    $events      = array_map([Event::class, 'post_to_calendar_series'], $events->to_array());
+    $events      = array_map([Event::class, 'post_to_calendar_series'], $events);
     $calendar    = new Calendar($events);
     $constraints = $query->recurrence_constraints();
 
     return array_map([Event::class, 'from_assoc'], $calendar->recurrences($constraints));
   } else {
-    return array_map([Event::class, 'from_post'], $events->to_array());
+    return array_map([Event::class, 'from_post'], $events);
   }
 }
 
@@ -216,7 +216,8 @@ function event_category() {
 
   if (!$ident) {
     // Return the current term, if there is one.
-    return Timber::get_term();
+    $current_term = Timber::get_term(get_queried_object_id());
+    return $current_term && is_a($current_term, 'Timber\Term') ? $current_term : false;
   }
 
   $field   = is_int($ident) ? 'id' : 'slug';
@@ -226,7 +227,9 @@ function event_category() {
     return false;
   }
 
-  return Timber::get_term($wp_term);
+  $timber_term = Timber::get_term($wp_term);
+  
+  return $timber_term && is_a($timber_term, 'Timber\Term') ? $timber_term : false;
 }
 
 /**
