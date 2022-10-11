@@ -166,12 +166,12 @@ add_filter('greg/render/events-list.twig', function(array $data) : array {
 });
 
 add_filter('timber/locations', function(array $paths) {
-  $paths['greg'] = array_filter([
+  $greg_paths = array_filter([
     get_template_directory() . '/views/greg',
     GREG_PLUGIN_VIEW_PATH . '/twig',
   ], 'is_dir');
 
-  return $paths;
+  return array_merge($paths, $greg_paths);
 });
 
 add_filter('timber/twig', function(Environment $twig) {

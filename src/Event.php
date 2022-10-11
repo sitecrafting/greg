@@ -199,6 +199,20 @@ class Event implements CoreInterface {
     return isset($this->post->$field);
   }
 
+  /**
+   * Gets meta fields for the given event post
+   * 
+	 * @param string $field_name
+	 * @return mixed
+	 */
+	public function meta( $field_name = null ) {
+		if ( $field_name === null ) {
+			//on the off-chance the field is actually named meta
+			$field_name = 'meta';
+		}
+		return $this->post->meta($field_name);
+	}
+
 
 
   /* API METHODS */
