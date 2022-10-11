@@ -19,7 +19,7 @@
     "wp-coding-standards/wpcs": "^2.3",
     "szepeviktor/phpstan-wordpress": "^0.6.5",
     "paulthewalton/acf-stubs": "^5.8.7",
-    "timber/timber": "2.x-dev"
+    "timber/timber": "^1.20"
   },
   "config": {
     "platform": {
