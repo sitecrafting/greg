@@ -298,7 +298,8 @@ class Calendar {
     // granularity based on frequencty, so that RRULE can properly parse
     // exception times.
     $aligned = array_map(function($exception) use ($event, $rules) {
-      return $this->align_time($exception, $event['start'], $rules['frequency']);
+      $event_start_with_override = $this->get_event_start_with_overrides($exception, $event);
+      return $this->align_time($exception, $event_start_with_override, $rules['frequency']);
     }, $normalized);
 
     // Filter out empty values, which could have been returned by parsing a
@@ -341,5 +342,52 @@ class Calendar {
     $dt_str    = gmdate($dt_fmt, strtotime($dt) ?: 0);
     $start_str = gmdate($start_fmt, strtotime($start) ?: 0);
     return date_create_immutable($dt_str . $start_str);
+  }
+
+  /**
+   * Given a target occurrence date string and an event, get the start date and time
+   * string, with any applicable override applied.
+   * 
+   * @param string $dt    The target event occurrence date string, formatted Y-m-d H:i:s
+   * @param array  $event The event data array, including recurrence data
+   * 
+   * @return string The start date of the event on the target date, possibly with the
+   *                time overridden
+   */
+  public function get_event_start_with_overrides(string $dt, array $event) {
+    // Start with the original start datetime
+    $start = $event['start'];
+    $overrides = $event['recurrence']['overrides'] ?? [];
+
+    if ($overrides) {
+      $days_of_week = [
+        1 => 'MO', 
+        2 => 'TU', 
+        3 => 'WE', 
+        4 => 'TH', 
+        5 => 'FR', 
+        6 => 'SA', 
+        7 => 'SU', 
+      ];
+      $dt_object = \DateTime::createFromFormat('Y-m-d H:i:s', $dt);
+      $dt_day_of_week = $dt_object->format('N');
+      $dt_day_of_week_code = $days_of_week[$dt_day_of_week];
+      $applicable_overrides = array_values(
+        array_filter(
+          $overrides,
+          function ($override) use ($dt_day_of_week_code) {
+            return in_array($dt_day_of_week_code, $override['BYDAY'] ?? []);
+          }
+        )
+      );
+
+      // Change the start datetime based on the override we found
+      if ($applicable_overrides) {
+        $override_time = $applicable_overrides[0]['start'];
+        $start = $dt_object->format('Y-m-d') . ' ' . $override_time;
+      }
+    }
+
+    return $start;
   }
 }
