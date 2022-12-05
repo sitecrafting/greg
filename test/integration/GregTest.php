@@ -449,4 +449,33 @@ class GregTest extends IntegrationTest {
       Greg\next_month_query_string()
     );
   }
+
+  public function test_get_events_with_recurrences_overrides_and_exceptions() {
+    $this->factory->post->create([
+      'post_type'         => 'greg_event',
+      'post_title'        => 'My Recurring Event with Override and Exception',
+      'meta_input'        => [
+        'greg_start'      => '2022-12-17 10:00:00',
+        'greg_end'        => '2022-12-17 11:00:00',
+        'greg_frequency'  => 'WEEKLY',
+        'greg_until'      => '2023-01-02 10:00:00',
+        'greg_exceptions' => ['2022-12-25 13:00:00'],
+        'greg_overrides'  => [
+          ['BYDAY' => ['SA'], 'start' => '10:00:00', 'end' => '11:00:00'],
+          ['BYDAY' => ['SU'], 'start' => '13:00:00', 'end' => '14:00:00'],
+        ],
+      ],
+    ]);
+
+    $events = Greg\get_events([
+      'current_time' => '2022-12-16',
+    ]);
+
+    $this->assertCount(4, $events);
+    foreach ($events as $event) {
+      $this->assertInstanceOf(Event::class, $event);
+      $this->assertEquals('My Recurring Event with Override and Exception', $event->title());
+      $this->assertNotEquals('2022-12-25', $event->start('Y-m-d'));
+    }
+  }
 }
