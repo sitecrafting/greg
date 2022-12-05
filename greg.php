@@ -6,7 +6,7 @@
  * Author: SiteCrafting
  * Author URI: https://www.sitecrafting.com/
  * Description: A de-coupled calendar solution for WordPress and Timber
- * Version: 0.4.2
+ * Version: 0.4.3
  * Requires PHP: 7.4
  */
 
