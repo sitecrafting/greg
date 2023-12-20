@@ -7,11 +7,11 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": "^7.4",
+    "php": "^8.2",
     "rlanvin/php-rrule": "dev-master"
   },
   "require-dev": {
-    "phpunit/phpunit": "^6.0",
+    "phpunit/phpunit": "^8",
     "johnpbloch/wordpress-core-installer": "^1.0",
     "johnpbloch/wordpress-core": "5.5.1",
     "mnsami/composer-custom-directory-installer": "^1.1",
@@ -19,11 +19,11 @@
     "wp-coding-standards/wpcs": "^2.3",
     "szepeviktor/phpstan-wordpress": "^0.6.5",
     "paulthewalton/acf-stubs": "^5.8.7",
-    "timber/timber": "^1.20"
+    "timber/timber": "^2"
   },
   "config": {
     "platform": {
-      "php": "7.4"
+      "php": "8.2"
     }
   },
   "extra": {
