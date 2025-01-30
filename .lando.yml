@@ -2,7 +2,7 @@ name: greg
 recipe: wordpress
 config:
   webroot: wp
-  php: '7.4'
+  php: '8.3'
   composer_version: 1
 
 services:
