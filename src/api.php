@@ -108,10 +108,14 @@ function get_events(array $params = []) {
     return false;
   }
 
-  $events = $query->get_results();
+  $eventsResults = $query->get_results();
 
-  if (!$events) {
+  if (!$eventsResults) {
     return false;
+  }
+
+  foreach($eventsResults as $event) {
+    $events[] = Timber::get_post($event);
   }
 
   // Unless recurrence expansion is explicitly disabled, expand each
