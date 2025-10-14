@@ -38,7 +38,7 @@ use Timber\Timber;
  */
 function compile(string $view, array $data = []) {
   return Timber::compile(
-    '@greg/' . $view,
+    $view,
     apply_filters('greg/render/' . $view, $data)
   );
 }
