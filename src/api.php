@@ -121,7 +121,7 @@ function get_events(array $params = []) {
   // Unless recurrence expansion is explicitly disabled, expand each
   // (potentially) recurring event into its comprising recurrences.
   if ($params['expand_recurrences'] ?? true) {
-    $events      = array_map([Event::class, 'post_to_calendar_series'], $events);
+    $events      = array_map([Event::class, 'post_to_calendar_series'], $events ?? []);
     $calendar    = new Calendar($events);
     $constraints = $query->recurrence_constraints();
 
