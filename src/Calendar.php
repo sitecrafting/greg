@@ -39,6 +39,16 @@ class Calendar {
    */
   protected $options;
 
+  const WEEKDAYS = array(
+      'MO' => 1,
+      'TU' => 2,
+      'WE' => 3,
+      'TH' => 4,
+      'FR' => 5,
+      'SA' => 6,
+      'SU' => 7
+  );
+
   /**
    * Create a new Calendar for parsing recurrence rules
    *
@@ -115,7 +125,7 @@ class Calendar {
         $override_days = $override['BYDAY'] ?? [];
         if (is_array($override_days) && !empty($override_days)) {
           foreach ($override_days as $day) {
-            $override_durations[RRule::WEEKDAYS[$day] . '-' . $override['start']] = $this->duration(
+            $override_durations[self::WEEKDAYS[$day] . '-' . $override['start']] = $this->duration(
               $start_date . ' ' . $override['start'],
               $end_date . ' ' . $override['end']
             );
