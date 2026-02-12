@@ -104,7 +104,7 @@ class Calendar {
     array $event,
     array $constraints
   ) : array {
-    if (empty($event['recurrence'])) {
+    if (empty($event['recurrence']) || (isset($event['recurrence']['frequency']) && strtoupper($event['recurrence']['frequency']) == 'ONCE')) {
       // no recurrence rules to parse; just add this event
       // to the aggregate and return
       $recurrences[] = $event;
